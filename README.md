@@ -1,16 +1,16 @@
 # NASAlt
 
 ## Problematique 
-Input : descriptif du réseau, matrice de demande (pe1 envoie autant de trafic à tel router)
-Graphe : routers et comment ils sont connectés entre eux
-Poids IGP
+- Input : descriptif du réseau (matrice d'adjacence), matrice de demande (pe1 envoie autant de trafic à tel router)
+- Graphe : routers et comment ils sont connectés entre eux
+- Poids IGP
 -> on peut calculer les chemins plus courts (en dijkstra). Prendre résultats de Dijkstra + matrice et comptabiliser le trafic sur chaque lien
 IA va dire quel poids mettre pour baisser les pressions des liens
 
 
 ## Overview
 - CST
-    - threshold de saturation
+    - threshold de saturation dépend de chaque lien, représentée dans la matrice d'adjacence
 - INPUT 
     - Matrice de demande en input
     - Le graph et les poids (matrices d’adjacence)
