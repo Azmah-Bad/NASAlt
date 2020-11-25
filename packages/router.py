@@ -3,26 +3,17 @@
 from random import *
 
 class Router:
-    def __init__ (self,router_id,adj_mat,dem_mat):
+    def __init__ (self,router_id,adjency_matrix,demand_matrix):
         self.router_id = router_id #We define the router id as the position of the router in the adjency matrix
-        wheight = adjency_matrix[router_id] #Weights of the different links to the neighbors
+        weight = adjency_matrix[router_id] #Weights of the different links to the neighbors
         self.charge = demand_matrix[router_id]
-        shortest_paths = {} #Shortests paths to the neighbors
-        
-       # for i in range( len(distance) ):
-        #    if distance[i] != 0:
-         #       shortest_paths[str(i)] = [randint(2,3),randint(2,3)] #replace the random int by the result of dijkstra on the router i
-
-        shortest_paths[str(1)] = [1] #replace the random int by the result of dijkstra on the router i
-        shortest_paths[str(2)] = [1,2] #replace the random int by the result of dijkstra on the router i
-        self.shortest_paths = shortest_paths
+        self.shortest_paths = {} #Shortests paths to the neighbors
         self.neighbors = [] #neighbors' router id
 
         #define the neighbors
-        for j in range(0,len(distance) ):
-            if ( distance[j] != 0 ):
+        for j in range(0,len(weight) ):
+            if ( weight[j] != 0 ):
                 self.neighbors.append(j)
-
 
     def __str__ (self):
         return 'router : %.2d' % (self.router_id) 
