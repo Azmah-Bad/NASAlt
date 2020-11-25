@@ -4,10 +4,10 @@ from random import *
 
 class Router:
     def __init__ (self,router_id,adj_mat,dem_mat):
-        self.router_id = router_id #We define the router id as the position of the router in the adj_mat
-        distance = adj_mat[router_id]
-        self.charge = dem_mat[router_id]
-        shortest_paths = {}
+        self.router_id = router_id #We define the router id as the position of the router in the adjency matrix
+        wheight = adjency_matrix[router_id] #Weights of the different links to the neighbors
+        self.charge = demand_matrix[router_id]
+        shortest_paths = {} #Shortests paths to the neighbors
         
        # for i in range( len(distance) ):
         #    if distance[i] != 0:
