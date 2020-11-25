@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
 from random import *
+import numpy as np
+
 
 '''check if a link exists
 *   return : -1 if the link does not exist, router_id of the dest we want to reach using this link 
@@ -26,3 +28,19 @@ def chargeLink(routers, dem_mat, link):
             value = dem_mat[r.router_id][int(dest)] 
             charge += value 
     return charge
+
+def computeModel(filename):
+
+    with open(filename) as f:
+        content = f.read()
+    
+    [nodes, edges] = content.split("edge", 1)
+    lastNodeDescription = nodes.rsplit("node", 1)[1]
+    nodeNumber = int(lastNodeDescription.split("id")[1].split('\n')[0].replace(' ','')) + 1
+
+    edges = edges.split("edge")
+    adjMat = np.zeros(dtype=np.uint8,shape=(nodeNumber, nodeNumber))
+    for _,oneEdge in enumerate(edges):
+        src = int(oneEdge.split("source")[1].split('\n')[0].replace(' ',''))
+        dest = int(oneEdge.split("target")[1].split('\n')[0].replace(' ',''))
+        adjMat[src][dest] = 1
