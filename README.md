@@ -10,7 +10,7 @@ IA va dire quel poids mettre pour baisser les pressions des liens
 
 ## Overview
 - CST
-    - threshold de saturation dépend de chaque lien, représentée dans la matrice d'adjacence
+    - threshold de saturation dépend de chaque lien
 - INPUT 
     - Matrice de demande en input
     - Le graph et les poids (matrices d’adjacence)
