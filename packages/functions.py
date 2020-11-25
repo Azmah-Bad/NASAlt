@@ -2,6 +2,7 @@
 
 from random import *
 import numpy as np
+import os
 
 
 
@@ -32,9 +33,19 @@ def chargeLink(routers, dem_mat, link):
     return charge
 
 def computeModel(filename):
+    '''construct the adjecency matrix of a graph descripted in the format used by http://sndlib.zib.de/home.action
+            input : filename = relative or absolute path to the description of the graph
+            output : adjMat = adjacency marix of the graph
+    '''
 
-    with open(filename) as f:
-        content = f.read()
+    if os.path.exists(filename):
+        try :
+            with open(filename) as f:
+                content = f.read()
+        except IOError e:
+            print("[computeModel] : erreur de lecture du fichier source  = {}\n".format(e))
+    else:
+        return -1
     
     [nodes, edges] = content.split("edge", 1)
     lastNodeDescription = nodes.rsplit("node", 1)[1]
@@ -46,3 +57,5 @@ def computeModel(filename):
         src = int(oneEdge.split("source")[1].split('\n')[0].replace(' ',''))
         dest = int(oneEdge.split("target")[1].split('\n')[0].replace(' ',''))
         adjMat[src][dest] = 1
+
+    return adjMat
