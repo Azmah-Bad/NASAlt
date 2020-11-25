@@ -3,10 +3,10 @@
 from random import *
 
 class Router:
-    def __init__ (self,router_id,adj_mat,dem_mat,router_nb):
-        self.router_id = router_id
-        distance = adj_mat[router_nb]
-        self.charge = dem_mat[router_nb]
+    def __init__ (self,router_id,adj_mat,dem_mat):
+        self.router_id = router_id #We define the router id as the position of the router in the adj_mat
+        distance = adj_mat[router_id]
+        self.charge = dem_mat[router_id]
         shortest_paths = {}
         
        # for i in range( len(distance) ):
@@ -41,7 +41,7 @@ if __name__ == "__main__":
     print("\nMatrice de demande :")
     print(mat_dem)
 
-    r1 = Router(0,mat_adj,mat_dem,0)
+    r1 = Router(0,mat_adj,mat_dem)
     r = [r1]
     print("Voisins :")
     print(r1.neighbours)
