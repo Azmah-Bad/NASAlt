@@ -16,12 +16,12 @@ class Router:
         shortest_paths[str(1)] = [1] #replace the random int by the result of dijkstra on the router i
         shortest_paths[str(2)] = [1,2] #replace the random int by the result of dijkstra on the router i
         self.shortest_paths = shortest_paths
-        self.neighbours = [] #neighbors' router id
+        self.neighbors = [] #neighbors' router id
 
-        #define the neighbours
+        #define the neighbors
         for j in range(0,len(distance) ):
             if ( distance[j] != 0 ):
-                self.neighbours.append(j)
+                self.neighbors.append(j)
 
 
     def __str__ (self):
