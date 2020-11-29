@@ -8,14 +8,14 @@ class Router:
         """
         Router class
         :param router_id:  int representing the Router's ID
-        :param adjacency_matrix:  numpy array of the adjacency matrix
+        :param adjacency_matrix:  numpy array of the adjacency matrix, unreachable immediate links have a value of math.inf
         :param demand_matrix:  numpy array  of the demand matrix
         """
         self.ID = router_id  # We define the router id as the position of the router in the adjency matrix
         self.adjacency_matrix = adjacency_matrix
         weight = adjacency_matrix[router_id]  # Weights of the different links to the neighbors
         self.charge = demand_matrix[router_id]
-        self.shortest_paths = {}  # Shortests paths to the neighbors
+        self.shortest_paths = {}  # Shortest paths to the neighbors
         self.neighbors = []  # neighbors' router id
 
         # define the neighbors
