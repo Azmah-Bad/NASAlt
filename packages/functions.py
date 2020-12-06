@@ -42,8 +42,8 @@ def computeModel(filename):
         try :
             with open(filename) as f:
                 content = f.read()
-        except IOError e:
-            print("[computeModel] : erreur de lecture du fichier source  = {}\n".format(e))
+        except IOError:
+            print("[computeModel] : erreur de lecture du fichier source\n")
     else:
         return -1
     
