@@ -17,6 +17,15 @@ class RouterTest(unittest.TestCase):
                             [1, math.inf, math.inf, 1],
                             [math.inf, 3, 1, math.inf]])
 
+    AdjMatrix2 = np.array([
+        [math.inf, 4, math.inf, math.inf, math.inf, math.inf],
+        [4, math.inf, 3, 6, math.inf, 2],
+        [math.inf, 3, math.inf, math.inf, 1, math.inf],
+        [math.inf, 6, math.inf, math.inf, 2, math.inf],
+        [math.inf, math.inf, 1, 2, math.inf, 5],
+        [math.inf, 2, math.inf, math.inf, 5, math.inf]
+    ])
+
     DemandMatrix = np.array([[0, 1, 2, 0],
                              [1, 0, 0, 3],
                              [2, 0, 0, 1],
@@ -55,6 +64,14 @@ class RouterTest(unittest.TestCase):
     def test_getNeighbors(self):
         mRouter = Router(self.RouterID, self.AdjMatrix, self.DemandMatrix)
         self.assertListEqual(mRouter.neighbors, [1, 2])
+
+    def test_dijkstra2(self):
+        CorrectOutput = {0: ([], 0), 1: ([1], 4.0), 2: ([1, 2], 7.0), 3: ([1, 3], 10.0), 4: ([1, 2, 4], 8.0),
+                         5: ([1, 5], 6.0)}
+        mRouter = Router(0, self.AdjMatrix2, self.DemandMatrix)
+        mRouter.dijkstra()
+        self.assertDictEqual(mRouter.shortest_paths, CorrectOutput)
+
 
 
 if __name__ == '__main__':
