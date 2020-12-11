@@ -69,13 +69,15 @@ class Router:
             adj_mat[link[1]][link[0]] = math.inf
         sp = {}
         NextHops = []
+        # init shortest paths
+        NextHops = []
         for Destination in range(len(adj_mat)):
             if adj_mat[self.ID][Destination] == math.inf:
-                sp[Destination] = ([], math.inf)
+                sp[Destination] = ([[]], math.inf)
             else:
-                sp[Destination] = ([Destination], adj_mat[self.ID][Destination])
+                sp[Destination] = ([[Destination]], adj_mat[self.ID][Destination])
                 NextHops.append(Destination)
-            sp[self.ID] = ([], 0)
+            sp[self.ID] = ([[]], 0)
 
         # for each hop we look at it's adjacent router and compare them to the path in the routing table
         while NextHops:
@@ -84,7 +86,12 @@ class Router:
                 for Destination, Cost in enumerate(adj_mat[NextHop]):
                     if Cost + CostToHop < sp[Destination][1]:  # less costly route
                         sp[Destination] = (
-                            sp[NextHop][0] + [Destination], Cost + CostToHop)
+                        [PathToHop + [Destination] for PathToHop in sp[NextHop][0]], Cost + CostToHop)
+                        NextHops.append(Destination)
+                    elif Cost + CostToHop == sp[Destination][1] and not \
+                    sp[Destination][1] == math.inf:  # same costly route
+                        sp[Destination][0].append(
+                            [OldRoute + [Destination] for OldRoute in sp[NextHop][0]])
                         NextHops.append(Destination)
                 NextHops.remove(NextHop)
 
@@ -95,7 +102,6 @@ class Router:
         compute the minimal increment needed to add to best alternative path for all destinations
         :param alternativeSP: alternative shortest paths (computed by restrainedDijsktra)
         """
-
         minIncrements = {}
         for dest in range(len(self.adjacency_matrix)):
             minIncrements[dest] = alternativeSP[dest][1] - self.shortest_paths[dest][1]

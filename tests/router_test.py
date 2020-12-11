@@ -64,7 +64,8 @@ class RouterTest(unittest.TestCase):
         self.assertListEqual(mRouter.neighbors, [1, 2])
 
     def test_dijkstra2(self):
-        CorrectOutput = {0: ([[]], 0), 1: ([[1]], 4.0), 2: ([[1, 2]], 7.0), 3: ([[1, 3], [[1, 2, 4, 3]]], 10.0), 4: ([[1, 2, 4]], 8.0), 5: ([[1, 5]], 6.0)}
+        CorrectOutput = {0: ([[]], 0), 1: ([[1]], 4.0), 2: ([[1, 2]], 7.0), 3: ([[1, 3], [[1, 2, 4, 3]]], 10.0),
+                         4: ([[1, 2, 4]], 8.0), 5: ([[1, 5]], 6.0)}
         mRouter = Router(0, self.AdjMatrix2, self.DemandMatrix)
         mRouter.dijkstra()
         self.assertDictEqual(mRouter.shortest_paths, CorrectOutput)
@@ -76,14 +77,16 @@ class RouterTest(unittest.TestCase):
                               [math.inf, 1, 1, math.inf]])
         mRouter = Router(0, AdjMatrix, self.DemandMatrix)
         mRouter.dijkstra()
-        self.assertDictEqual(mRouter.shortest_paths, {0: ([[]], 0), 1: ([[1]], 1.0), 2: ([[2]], 1.0), 3: ([[1, 3], [[2, 3]]], 2.0)})
+        self.assertDictEqual(mRouter.shortest_paths,
+                             {0: ([[]], 0), 1: ([[1]], 1.0), 2: ([[2]], 1.0), 3: ([[1, 3], [[2, 3]]], 2.0)})
 
     def test_alternative(self):
         mRouter = Router(2, self.AdjMatrix2, self.DemandMatrix)
-        alter = mRouter.restrainedDijkstra([[2,1]])
-        self.assertDictEqual(alter, 0: ([4, 5, 1, 0], 12.0), 2: ([], 0), 1: ([4, 5, 1], 8.0), 3: ([4, 3], 3.0), 4: ([4], 1.0), 5: ([4, 5], 6.0)})
-        self.assertDictEqual(mRouter.getMinIncrements(alter)), 0: 5.0, 1: 5.0, 2: 0, 3: 0.0, 4: 0.0, 5: 1.0})
-
+        alter = mRouter.restrainedDijkstra([[2, 1]])
+        mRouter.dijkstra()
+        self.assertDictEqual(alter, {0: ([[4, 5, 1, 0]], 12.0), 2: ([[]], 0), 1: ([[4, 5, 1]], 8.0), 3: ([[4, 3]], 3.0),
+                                     4: ([[4]], 1.0), 5: ([[4, 5]], 6.0)})
+        self.assertDictEqual(mRouter.getMinIncrements(alter), {0: 5.0, 1: 5.0, 2: 0, 3: 0.0, 4: 0.0, 5: 1.0})
 
 
 if __name__ == '__main__':
