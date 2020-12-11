@@ -17,12 +17,20 @@ class FunctionsTest(unittest.TestCase):
 
     DemandMatrix = np.random.randint(70, size=(6,6))
 
-    mNetwork = Network(AdjMatrix, DemandMatrix)
+    mNetwork = Network(AdjMatrix, DemandMatrix, 10*np.ones(shape=np.shape(AdjacencyMatrix)))
 
     def test_isThereLink(self):
         self.assertEqual(isThereLink(self.mNetwork.Routers[0], (0,1) ), 1)
         self.assertEqual(isThereLink(self.mNetwork.Routers[0], (1,4) ), -1)
         self.assertEqual(isThereLink(self.mNetwork.Routers[0], (2,4) ), 4)
+
+    def test_howManySP(self):
+        self.assertEqual(howManySP(mNetwork.Routers[0],1), 1)
+        self.assertEqual(howManySP(mNetwork.Routers[0],3), 2)
+
+    def test_loadLink(self):
+        self.assertEqual( loadLink(mNetwork.Routers, self.DemandMatrix, (0,1)),10 )
+        
 
 if __name__ == '__main__':
     unittest.main()
