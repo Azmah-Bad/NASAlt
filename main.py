@@ -30,14 +30,6 @@ if __name__ == "__main__":
         [math.inf,2,math.inf,math.inf,5,math.inf]
     ])
 
-    mprime = np.array([
-        [math.inf,4,math.inf,math.inf,math.inf,math.inf],
-        [4,math.inf,math.inf,6,math.inf,2],
-        [math.inf,math.inf,math.inf,math.inf,1,math.inf],
-        [math.inf,6,math.inf,math.inf,2,math.inf],
-        [math.inf,math.inf,1,2,math.inf,5],
-        [math.inf,2,math.inf,math.inf,5,math.inf]
-    ])
         #Create a random demand matrix within a link's load can not exceed 70
     mat_dem = np.random.randint(70, size=(6,6))
 

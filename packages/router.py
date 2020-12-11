@@ -57,7 +57,7 @@ class Router:
 
         return self.shortest_paths
 
-    def retrainedDijkstra(self, ids):
+    def restrainedDijkstra(self, ids):
         """
         compute the most beneficial alternative paths which do not use the identified link
         :param ids: router ids of two router at each end of the charged link
