@@ -4,14 +4,14 @@ import numpy as np
 
 class Network:
 
-    def __init__(self, AdjacencyMatrix, DemandMatrix, capacityMatrix):
+    def __init__(self, AdjacencyMatrix, DemandMatrix, capacityMatrix=None):
         self.AdjacencyMatrix = AdjacencyMatrix
         self.Routers = []
         self.DemandMatrix = DemandMatrix
 
         for ID in range(len(AdjacencyMatrix)):
             self.Routers.append(Router(ID, AdjacencyMatrix, DemandMatrix))
-        if capacityMatrix == []:
+        if capacityMatrix == None:
             self.CapacityMatrix = 10*np.ones(shape=np.shape(AdjacencyMatrix))
         else :
             self.CapacityMatrix = capacityMatrix

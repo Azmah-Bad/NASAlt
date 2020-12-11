@@ -12,11 +12,14 @@ def isThereLink(router, link):
     :param link: a tuple corresponding to a link ( ex: (1,3) )
     :return: -1 if the link does not exist, (int) router_id of the dest we want to reach using this link
     """
+    if router.ID == link[0]:
+        if link[1] in router.neighbors :
+            return link[1]
     for dest, path in router.shortest_paths.items():
         #print("path : ", path[0])
         for j in range(len(path[0])):
             if j < len(path[0]) - 1 and path[0][j] == link[0] and path[0][j + 1] == link[1]:
-                return int(dest)
+                return dest
     return -1
 
 def howManySP(router,dest):
@@ -59,7 +62,7 @@ def computeLoadMatrix(network):
     for i in range( len(network.LoadMatrix) ):
         for j in range( len(network.LoadMatrix) ):
             network.LoadMatrix[i][j] = loadLink(network.Routers,demand_matrix, (i,j) ) 
-    
+
 def loadLink(routers, dem_mat, link):
     """
     check the charge of a link by finding all the routers which use this link

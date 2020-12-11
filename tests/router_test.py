@@ -75,8 +75,8 @@ class RouterTest(unittest.TestCase):
     def test_alternative(self):
         mRouter = Router(2, self.AdjMatrix2, self.DemandMatrix)
         alter = mRouter.retrainedDijkstra([[2,1]])
-        assertDictEqual(alter, 0: ([4, 5, 1, 0], 12.0), 2: ([], 0), 1: ([4, 5, 1], 8.0), 3: ([4, 3], 3.0), 4: ([4], 1.0), 5: ([4, 5], 6.0)})
-        assertDictEqual(mRouter.getMinIncrements(alter)), 0: 5.0, 1: 5.0, 2: 0, 3: 0.0, 4: 0.0, 5: 1.0})
+        assertDictEqual(alter, {0: ([4, 5, 1, 0], 12.0), 2: ([], 0), 1: ([4, 5, 1], 8.0), 3: ([4, 3], 3.0), 4: ([4], 1.0), 5: ([4, 5], 6.0)})
+        assertDictEqual( mRouter.getMinIncrements(alter), {0: 5.0, 1: 5.0, 2: 0, 3: 0.0, 4: 0.0, 5: 1.0})
 
 
 if __name__ == '__main__':
