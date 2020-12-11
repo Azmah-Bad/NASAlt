@@ -80,3 +80,23 @@ def computeModel(filename):
         adjMat[src][dest] = 1
 
     return adjMat
+
+    def getMaxLoad(lMatrix):
+        """
+        Return the charge and position of the most charged link(s) (percentage) in the network
+        :return: {maxLoad : positions with load==maxLoad}
+        """
+        value = np.amax(lMatrix)
+        indexes = np.where(lMatrix == value)
+        indexes = list(zip(indexes[0], indexes[1]))
+        return {value : indexes}
+
+    def isSaturated(lMatrix):
+        """
+        check if network is saturated
+        :return: [positions of saturated links] or -1
+        """ 
+        saturated = np.where(lMatrix >= 100)
+        if saturated[0].size > 0:
+            return list(zip(saturated[0],saturated[1]))
+        return -1
