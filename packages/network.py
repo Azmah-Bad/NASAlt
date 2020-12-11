@@ -58,11 +58,3 @@ class Network:
             print("#",router.ID,"\n",router.shortest_paths,"\n")
         return 1
 
-    def getMaxLoad(self):
-        """
-        Return the charge and position of the most charged link(s) (percentage) in the network
-        """
-        value = np.amax(self.LoadMatrix)
-        indexes = np.where(self.LoadMatrix == value)
-        indexes = list(zip(indexes[0], indexes[1]))
-        return {value : indexes}
