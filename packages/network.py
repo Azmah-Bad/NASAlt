@@ -10,7 +10,7 @@ class Network:
         for ID in range(len(AdjacencyMatrix)):
             self.Routers.append(Router(ID, AdjacencyMatrix, DemandMatrix))
         self.CapacityMatrix = 10*np.ones(shape=np.shape(AdjacencyMatrix))
-        self.LoadMatric = np.zeros(shape=np.shape(AdjacencyMatrix))
+        self.LoadMatrix = np.zeros(shape=np.shape(AdjacencyMatrix))
 
     def __init__(self, AdjacencyMatrix, DemandMatrix, capacityMatrix):
         self.AdjacencyMatrix = AdjacencyMatrix
@@ -19,7 +19,7 @@ class Network:
         for ID in range(len(AdjacencyMatrix)):
             self.Routers.append(Router(ID, AdjacencyMatrix, DemandMatrix))
         self.CapacityMatrix = capacityMatrix
-        self.LoadMatric = np.zeros(shape=np.shape(AdjacencyMatrix))
+        self.LoadMatrix = np.zeros(shape=np.shape(AdjacencyMatrix))
 
     def getRouterByID(self, ID: int) -> Router or None:
         """
@@ -60,6 +60,9 @@ class Network:
 
     def getMaxLoad(self):
         """
-        Return the charge of the most charged link (percentage) in the network
+        Return the charge and position of the most charged link(s) (percentage) in the network
         """
-        return 
+        value = np.amax(self.LoadMatrix)
+        indexes = np.where(self.LoadMatrix == value)
+        indexes = list(zip(indexes[0], indexes[1]))
+        return {value : indexes}
