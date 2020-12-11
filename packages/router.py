@@ -48,10 +48,15 @@ class Router:
                 CostToHop = self.shortest_paths[NextHop][1]  # the cost of the current hop
                 for Destination, Cost in enumerate(self.adjacency_matrix[NextHop]):
                     if Cost + CostToHop < self.shortest_paths[Destination][1]:  # less costly route
-                        self.shortest_paths[Destination] = ([PathToHop + [Destination] for PathToHop in self.shortest_paths[NextHop][0]], Cost + CostToHop)
+                        self.shortest_paths[Destination] = (
+                            [PathToHop + [Destination] for PathToHop in self.shortest_paths[NextHop][0]],
+                            Cost + CostToHop)
                         NextHops.append(Destination)
-                    elif Cost + CostToHop == self.shortest_paths[Destination][1] and not self.shortest_paths[Destination][1] == math.inf:  # same costly route
-                        self.shortest_paths[Destination][0].append([OldRoute + [Destination] for OldRoute in self.shortest_paths[NextHop][0]])
+                    elif Cost + CostToHop == self.shortest_paths[Destination][1] and not \
+                            self.shortest_paths[Destination][1] == math.inf:  # same costly route
+                        for OldRoute in self.shortest_paths[NextHop][0]:
+                            NewRoute = OldRoute + [Destination]
+                            self.shortest_paths[Destination][0].append(NewRoute)
                         NextHops.append(Destination)
                 NextHops.remove(NextHop)
 
@@ -86,12 +91,13 @@ class Router:
                 for Destination, Cost in enumerate(adj_mat[NextHop]):
                     if Cost + CostToHop < sp[Destination][1]:  # less costly route
                         sp[Destination] = (
-                        [PathToHop + [Destination] for PathToHop in sp[NextHop][0]], Cost + CostToHop)
+                            [PathToHop + [Destination] for PathToHop in sp[NextHop][0]], Cost + CostToHop)
                         NextHops.append(Destination)
                     elif Cost + CostToHop == sp[Destination][1] and not \
-                    sp[Destination][1] == math.inf:  # same costly route
-                        sp[Destination][0].append(
-                            [OldRoute + [Destination] for OldRoute in sp[NextHop][0]])
+                            sp[Destination][1] == math.inf:  # same costly route
+                        for OldRoute in sp[NextHop][0]:
+                            NewRoute = OldRoute + [Destination]
+                            sp[Destination][0].append(NewRoute)
                         NextHops.append(Destination)
                 NextHops.remove(NextHop)
 
