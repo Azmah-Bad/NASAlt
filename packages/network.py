@@ -1,4 +1,5 @@
 from .router import Router
+import numpy as np
 
 
 class Network:
@@ -9,6 +10,17 @@ class Network:
 
         for ID in range(len(AdjacencyMatrix)):
             self.Routers.append(Router(ID, AdjacencyMatrix, DemandMatrix))
+        self.CapacityMatrix = 10*np.ones(shape=np.shape(AdjacencyMatrix))
+        self.LoadMatric = np.zeros(shape=np.shape(AdjacencyMatrix))
+
+    def __init__(self, AdjacencyMatrix, DemandMatrix, capacityMatrix):
+        self.AdjacencyMatrix = AdjacencyMatrix
+        self.Routers = []
+
+        for ID in range(len(AdjacencyMatrix)):
+            self.Routers.append(Router(ID, AdjacencyMatrix, DemandMatrix))
+        self.CapacityMatrix = capacityMatrix
+        self.LoadMatric = np.zeros(shape=np.shape(AdjacencyMatrix))
 
     def getRouterByID(self, ID: int) -> Router or None:
         """
@@ -46,3 +58,9 @@ class Network:
         for router in self.Routers:
             print("#",router.ID,"\n",router.shortest_paths,"\n")
         return 1
+
+    def getMaxLoad(self):
+        """
+        Return the charge of the most charged link (percentage) in the network
+        """
+        return 
