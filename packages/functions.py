@@ -18,17 +18,20 @@ def isThereLink(router, link):
                 return int(dest)
     return -1
 
-def howManySP(router,dest):
+
+def howManySP(router, dest):
     """
     check how many shortest path exists to reach dest. Used for ECMP.
     :param router: an object Router
     :param dest:
     :return: int corresponding to the number of shortest path to reach dest
     """
-    if string(dest) not in router.shortest_paths:
+    if dest not in router.shortest_paths.keys():
         return 0
     else:
-        return len( router.shortest_path[string(dest)] ) #discuss of the structure of router.shortest_path, especially when there are several paths
+        return len(router.shortest_path[
+            dest])  # discuss of the structure of router.shortest_path, especially when there are several paths
+
 
 def loadLink(routers, dem_mat, link):
     """
@@ -43,8 +46,9 @@ def loadLink(routers, dem_mat, link):
     for r in routers:  # browse the routers
         dest = isThereLink(r, link)
         if dest != -1:
-            nb_shortest_paths = howManySP(router,dest)
-            value = dem_mat[r.router_id][dest] / nb_shortest_paths #ECMP if there is several shortest paths to reach a dest
+            nb_shortest_paths = howManySP(router, dest)
+            value = dem_mat[r.router_id][
+                        dest] / nb_shortest_paths  # ECMP if there is several shortest paths to reach a dest
             charge += value
     return charge
 
