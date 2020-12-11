@@ -30,6 +30,26 @@ def howManySP(router,dest):
     else:
         return len( router.shortest_path[string(dest)] ) #discuss of the structure of router.shortest_path, especially when there are several paths
 
+def disturbNetwork(network):
+    """
+    Increase randomly links load on the network
+    :param network: an object Network
+    :return: void
+    """
+    demand_matrix = network.DemandMatrix
+    capacity_matrix = network.CapacityMatrix
+
+    i = randint( 1,len(demand_matrix)-1 )
+    j = randint( 1,len(demand_matrix)-1 )
+    demand_matrix[i][j] += randint( 1,capacity_matrix[i][j]/2 )
+
+    while demande_matrix[i][j] >= capacity_matrix[i][j]:
+        i = randint( 1,len(demand_matrix)-1 )
+        j = randint( 1,len(demand_matrix)-1 )
+        demand_matrix[i][j] += randint( 1,capacity_matrix[i][j]/2 )
+
+    #computeLoadMatrix(..)
+
 def loadLink(routers, dem_mat, link):
     """
     check the charge of a link by finding all the routers which use this link

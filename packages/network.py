@@ -5,6 +5,7 @@ class Network:
     def __init__(self, AdjacencyMatrix, DemandMatrix):
         self.AdjacencyMatrix = AdjacencyMatrix
         self.Routers = []
+        self.DemandMatrix = DemandMatrix
 
         for ID in range(len(AdjacencyMatrix)):
             self.Routers.append(Router(ID, AdjacencyMatrix, DemandMatrix))
