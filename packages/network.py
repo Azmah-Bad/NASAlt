@@ -51,11 +51,6 @@ class Network:
         Print all the shortest path of each router of the network
         """
         for router in self.Routers:
-            print("#",router.ID,"\n",router.shortest_paths,"\n")
+            print("#", router.ID, "\n", router.shortest_paths, "\n")
         return 1
 
-    def getMaxLoad(self):
-        """
-        Return the charge of the most charged link (percentage) in the network
-        """
-        return 

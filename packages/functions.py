@@ -22,17 +22,18 @@ def isThereLink(router, link):
                 return dest
     return -1
 
-def howManySP(router,dest):
+
+def howManySP(router, dest):
     """
     check how many shortest path exists to reach dest. Used for ECMP.
     :param router: an object Router
     :param dest:
     :return: int corresponding to the number of shortest path to reach dest
     """
-    if dest not in router.shortest_paths:
+    if dest not in router.shortest_paths.keys():
         return 0
     else:
-        return len( router.shortest_paths[dest][0] ) # /!\ change to fit with the new version of Dijkstra with several SP!
+        return len(router.shortest_path[dest])  # discuss of the structure of router.shortest_path, especially when there are several paths
 
 def disturbNetwork(network):
     """
@@ -109,3 +110,23 @@ def computeModel(filename):
         adjMat[src][dest] = 1
 
     return adjMat
+
+    def getMaxLoad(lMatrix):
+        """
+        Return the charge and position of the most charged link(s) (percentage) in the network
+        :return: {maxLoad : positions with load==maxLoad}
+        """
+        value = np.amax(lMatrix)
+        indexes = np.where(lMatrix == value)
+        indexes = list(zip(indexes[0], indexes[1]))
+        return {value : indexes}
+
+    def isSaturated(lMatrix):
+        """
+        check if network is saturated
+        :return: [positions of saturated links] or -1
+        """ 
+        saturated = np.where(lMatrix >= 100)
+        if saturated[0].size > 0:
+            return list(zip(saturated[0],saturated[1]))
+        return -1
