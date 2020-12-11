@@ -21,8 +21,8 @@ class FunctionsTest(unittest.TestCase):
 
     def test_isThereLink(self):
         self.assertEqual(isThereLink(self.mNetwork.Routers[0], (0,1) ), 1)
-        self.assertEqual(isThereLink(self.mNetwork.Routers[0], (0,4) ), -1)
-
+        self.assertEqual(isThereLink(self.mNetwork.Routers[0], (1,4) ), -1)
+        self.assertEqual(isThereLink(self.mNetwork.Routers[0], (2,4) ), 4)
 
 if __name__ == '__main__':
     unittest.main()
