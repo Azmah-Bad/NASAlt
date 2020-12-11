@@ -11,7 +11,7 @@ class Network:
         for ID in range(len(AdjacencyMatrix)):
             self.Routers.append(Router(ID, AdjacencyMatrix, DemandMatrix))
         self.CapacityMatrix = 10*np.ones(shape=np.shape(AdjacencyMatrix))
-        self.LoadMatric = np.zeros(shape=np.shape(AdjacencyMatrix))
+        self.LoadMatrix = np.zeros(shape=np.shape(AdjacencyMatrix))
 
     def __init__(self, AdjacencyMatrix, DemandMatrix, capacityMatrix):
         self.AdjacencyMatrix = AdjacencyMatrix
@@ -20,7 +20,7 @@ class Network:
         for ID in range(len(AdjacencyMatrix)):
             self.Routers.append(Router(ID, AdjacencyMatrix, DemandMatrix))
         self.CapacityMatrix = capacityMatrix
-        self.LoadMatric = np.zeros(shape=np.shape(AdjacencyMatrix))
+        self.LoadMatrix = np.zeros(shape=np.shape(AdjacencyMatrix))
 
     def getRouterByID(self, ID: int) -> Router or None:
         """

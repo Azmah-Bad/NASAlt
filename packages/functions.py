@@ -50,10 +50,17 @@ def disturbNetwork(network):
 
     #computeLoadMatrix(..)
 
+def computeLoadMatrix(network): 
+    demand_matrix = network.DemandMatrix
+
+    for i in range( len(network.LoadMatrix) ):
+        for j in range( len(network.LoadMatrix) ):
+            network.LoadMatrix[i][j] = loadLink(network.Routers,demand_matrix, (i,j) )
+
 def loadLink(routers, dem_mat, link):
     """
     check the charge of a link by finding all the routers which use this link
-    :param router: an object Router
+    :param routers: an array of object Router
     :param demand_mat: square matrix of int
     :param link: a tuple corresponding to a link ( ex: (1,3) )
     :return: int>0 charge of a link
