@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import math
 import numpy as np
-
+from copy import copy
 
 class Router:
     def __init__(self, router_id, adjacency_matrix, demand_matrix):
@@ -53,3 +53,53 @@ class Router:
                 NextHops.remove(NextHop)
 
         return self.shortest_paths
+    
+    def retrainedDijkstra(self,ids):
+        """
+        compute the most beneficial alternative paths which do not use the identified link
+        :param ids: router ids of two router at each end of the charged link
+        """
+
+        adj_mat = copy(self.adjacency_matrix)
+        for link in ids:
+            adj_mat[link[0]][link[1]] = math.inf
+            adj_mat[link[1]][link[0]] = math.inf
+        sp ={}
+        NextHops = []
+        for Destination in range(len(adj_mat)):
+            if adj_mat[self.ID][Destination] == math.inf:
+                sp[Destination] = ([], math.inf)
+            else:
+                sp[Destination] = ([Destination], adj_mat[self.ID][Destination])
+                NextHops.append(Destination)
+            sp[self.ID] = ([], 0)
+
+        # for each hop we look at it's adjacent router and compare them to the path in the routing table
+        while NextHops:
+            for NextHop in NextHops:
+                CostToHop = sp[NextHop][1]  # the cost of the current hop
+                for Destination, Cost in enumerate(adj_mat[NextHop]):
+                    if Cost + CostToHop < sp[Destination][1]:  # less costly route
+                        sp[Destination] = (
+                            sp[NextHop][0] + [Destination], Cost + CostToHop)
+                        NextHops.append(Destination)
+                NextHops.remove(NextHop)
+            
+        return sp
+
+    def getMinIncrements(self,alternativeSP):
+        """
+        compute the minimal increment needed to add to best alternative path for all destinations
+        :param alternativeSP: alternative shortest paths (computed by restrainedDijsktra)
+        """
+
+        minIncrements = {}
+        for dest in range(len(self.adjacency_matrix)):
+            minIncrements[dest] = alternativeSP[dest][1] - self.shortest_paths[dest][1] 
+    
+        return minIncrements
+
+
+
+
+        
