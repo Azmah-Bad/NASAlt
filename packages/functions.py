@@ -13,8 +13,9 @@ def isThereLink(router, link):
     :return: -1 if the link does not exist, (int) router_id of the dest we want to reach using this link
     """
     for dest, path in router.shortest_paths.items():
-        for j in range(len(path)):
-            if j < len(path) - 1 and path[j] == link[0] and path[j + 1] == link[1]:
+        #print("path : ", path[0])
+        for j in range(len(path[0])):
+            if j < len(path[0]) - 1 and path[0][j] == link[0] and path[0][j + 1] == link[1]:
                 return int(dest)
     return -1
 
@@ -25,10 +26,10 @@ def howManySP(router,dest):
     :param dest:
     :return: int corresponding to the number of shortest path to reach dest
     """
-    if string(dest) not in router.shortest_paths:
+    if dest not in router.shortest_paths:
         return 0
     else:
-        return len( router.shortest_path[string(dest)] ) #discuss of the structure of router.shortest_path, especially when there are several paths
+        return len( router.shortest_paths[dest][0] ) # /!\ change to fit with the new version of Dijkstra with several SP!
 
 def disturbNetwork(network):
     """
@@ -43,20 +44,22 @@ def disturbNetwork(network):
     j = randint( 1,len(demand_matrix)-1 )
     demand_matrix[i][j] += randint( 1,capacity_matrix[i][j]/2 )
 
-    while demande_matrix[i][j] >= capacity_matrix[i][j]:
+    while demand_matrix[i][j] >= capacity_matrix[i][j]:
         i = randint( 1,len(demand_matrix)-1 )
         j = randint( 1,len(demand_matrix)-1 )
-        demand_matrix[i][j] += randint( 1,capacity_matrix[i][j]/2 )
+        demand_matrix[i][j] += randint( 1,capacity_matrix[i][j]/2 ) #maybe start at a lower value than 1 to have a real impact
 
     #computeLoadMatrix(..)
 
 def computeLoadMatrix(network): 
     demand_matrix = network.DemandMatrix
+    capacity_matrix = network.CapacityMatrix
+    print("\n demand_matrix \n",demand_matrix,"\n")
 
     for i in range( len(network.LoadMatrix) ):
         for j in range( len(network.LoadMatrix) ):
-            network.LoadMatrix[i][j] = loadLink(network.Routers,demand_matrix, (i,j) )
-
+            network.LoadMatrix[i][j] = loadLink(network.Routers,demand_matrix, (i,j) ) 
+    
 def loadLink(routers, dem_mat, link):
     """
     check the charge of a link by finding all the routers which use this link
@@ -70,8 +73,8 @@ def loadLink(routers, dem_mat, link):
     for r in routers:  # browse the routers
         dest = isThereLink(r, link)
         if dest != -1:
-            nb_shortest_paths = howManySP(router,dest)
-            value = dem_mat[r.router_id][dest] / nb_shortest_paths #ECMP if there is several shortest paths to reach a dest
+            nb_shortest_paths = howManySP(r,dest)
+            value = dem_mat[r.ID][dest] / nb_shortest_paths #ECMP if there is several shortest paths to reach a dest
             charge += value
     return charge
 
