@@ -3,6 +3,7 @@ import math
 import numpy as np
 from copy import copy
 
+
 class Router:
     def __init__(self, router_id, adjacency_matrix, demand_matrix):
         """
@@ -35,11 +36,11 @@ class Router:
         NextHops = []
         for Destination in range(len(self.adjacency_matrix)):
             if self.adjacency_matrix[self.ID][Destination] == math.inf:
-                self.shortest_paths[Destination] = ([], math.inf)
+                self.shortest_paths[Destination] = ([[]], math.inf)
             else:
-                self.shortest_paths[Destination] = ([Destination], self.adjacency_matrix[self.ID][Destination])
+                self.shortest_paths[Destination] = ([[Destination]], self.adjacency_matrix[self.ID][Destination])
                 NextHops.append(Destination)
-            self.shortest_paths[self.ID] = ([], 0)
+            self.shortest_paths[self.ID] = ([[]], 0)
 
         # for each hop we look at it's adjacent router and compare them to the path in the routing table
         while NextHops:
@@ -47,14 +48,16 @@ class Router:
                 CostToHop = self.shortest_paths[NextHop][1]  # the cost of the current hop
                 for Destination, Cost in enumerate(self.adjacency_matrix[NextHop]):
                     if Cost + CostToHop < self.shortest_paths[Destination][1]:  # less costly route
-                        self.shortest_paths[Destination] = (
-                            self.shortest_paths[NextHop][0] + [Destination], Cost + CostToHop)
+                        self.shortest_paths[Destination] = ([PathToHop + [Destination] for PathToHop in self.shortest_paths[NextHop][0]], Cost + CostToHop)
+                        NextHops.append(Destination)
+                    elif Cost + CostToHop == self.shortest_paths[Destination][1] and not self.shortest_paths[Destination][1] == math.inf:  # same costly route
+                        self.shortest_paths[Destination][0].append([OldRoute + [Destination] for OldRoute in self.shortest_paths[NextHop][0]])
                         NextHops.append(Destination)
                 NextHops.remove(NextHop)
 
         return self.shortest_paths
-    
-    def restrainedDijkstra(self,ids):
+
+    def restrainedDijkstra(self, ids):
         """
         compute the most beneficial alternative paths which do not use the identified link
         :param ids: router ids of two router at each end of the charged link
@@ -64,15 +67,17 @@ class Router:
         for link in ids:
             adj_mat[link[0]][link[1]] = math.inf
             adj_mat[link[1]][link[0]] = math.inf
-        sp ={}
+        sp = {}
+        NextHops = []
+        # init shortest paths
         NextHops = []
         for Destination in range(len(adj_mat)):
             if adj_mat[self.ID][Destination] == math.inf:
-                sp[Destination] = ([], math.inf)
+                sp[Destination] = ([[]], math.inf)
             else:
-                sp[Destination] = ([Destination], adj_mat[self.ID][Destination])
+                sp[Destination] = ([[Destination]], adj_mat[self.ID][Destination])
                 NextHops.append(Destination)
-            sp[self.ID] = ([], 0)
+            sp[self.ID] = ([[]], 0)
 
         # for each hop we look at it's adjacent router and compare them to the path in the routing table
         while NextHops:
@@ -81,25 +86,24 @@ class Router:
                 for Destination, Cost in enumerate(adj_mat[NextHop]):
                     if Cost + CostToHop < sp[Destination][1]:  # less costly route
                         sp[Destination] = (
-                            sp[NextHop][0] + [Destination], Cost + CostToHop)
+                        [PathToHop + [Destination] for PathToHop in sp[NextHop][0]], Cost + CostToHop)
+                        NextHops.append(Destination)
+                    elif Cost + CostToHop == sp[Destination][1] and not \
+                    sp[Destination][1] == math.inf:  # same costly route
+                        sp[Destination][0].append(
+                            [OldRoute + [Destination] for OldRoute in sp[NextHop][0]])
                         NextHops.append(Destination)
                 NextHops.remove(NextHop)
-            
+
         return sp
 
-    def getMinIncrements(self,alternativeSP):
+    def getMinIncrements(self, alternativeSP):
         """
         compute the minimal increment needed to add to best alternative path for all destinations
         :param alternativeSP: alternative shortest paths (computed by restrainedDijsktra)
         """
-
         minIncrements = {}
         for dest in range(len(self.adjacency_matrix)):
-            minIncrements[dest] = alternativeSP[dest][1] - self.shortest_paths[dest][1] 
-    
+            minIncrements[dest] = alternativeSP[dest][1] - self.shortest_paths[dest][1]
+
         return minIncrements
-
-
-
-
-        

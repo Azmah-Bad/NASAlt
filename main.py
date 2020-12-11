@@ -7,7 +7,6 @@ import numpy as np
 import math
 
 if __name__ == "__main__":
-
     mat_adj = computeModel("inputs/france.gml")
     #print("Matrice d'adjacence : ")
     #print(mat_adj)
@@ -31,9 +30,9 @@ if __name__ == "__main__":
         [math.inf,2,math.inf,math.inf,5,math.inf]
     ])
 
-        #Create a random demand matrix within a link's load can not exceed 70 
+        #Create a random demand matrix within a link's load can not exceed 70
     mat_dem = np.random.randint(70, size=(6,6))
-    
+
     mySimpleNetwork = Network(mat_adj2_cor,mat_dem)
     print(mySimpleNetwork.getAllRouterIDs())
     mySimpleNetwork.nDijkstra()
