@@ -31,9 +31,16 @@ if __name__ == "__main__":
     ])
 
         #Create a random demand matrix within a link's load can not exceed 70
-    mat_dem = np.random.randint(70, size=(6,6))
+    mat_dem = 10*np.ones(shape=np.shape(mat_adj2_cor))
 
     mySimpleNetwork = Network(mat_adj2_cor,mat_dem)
+    """
     print(mySimpleNetwork.getAllRouterIDs())
     mySimpleNetwork.nDijkstra()
     mySimpleNetwork.getAllShortestPath()
+    computeLoadMatrix(mySimpleNetwork)
+    print("loadMatrix : \n", mySimpleNetwork.LoadMatrix)
+    """
+    print(mySimpleNetwork.DemandMatrix, "\n")
+    disturbNetwork(mySimpleNetwork, 4)
+    print(mySimpleNetwork.DemandMatrix)
