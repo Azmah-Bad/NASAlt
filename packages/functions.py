@@ -20,8 +20,10 @@ def isThereLink(router, link):
     for dest, paths in router.shortest_paths.items():
         paths_to_add = []
         for path in paths[0]:
+            if len(path) == 1 and router.ID == link[0] and link[1] in router.neighbors:
+                        paths_to_add.append([[ link[1] ]])
             for j in range(len(path)):
-                if j < len(path) - 1 and path[j] == link[0] and path[j + 1] == link[1]:
+                if (j < len(path) - 1 and path[j] == link[0] and path[j + 1] == link[1]) or (j < len(path) - 1 and path[j+1] == link[0] and path[j] == link[1]):
                     paths_to_add.append(path)
         if paths_to_add != []:
             res[dest] = paths_to_add
@@ -57,12 +59,15 @@ def disturbNetwork(network, nb):
         i = randint(1, len(demand_matrix) - 1)
         j = randint(1, len(demand_matrix) - 1)
         demand_matrix[i][j] += randint(1, capacity_matrix[i][j] / 2) # maybe start at a lower value than 1 to have a real impact
-    # computeLoadMatrix(..)
+
+    #computeLoadMatrix(network) pb : asymetric loadmatrix when i compute
 
 
 def computeLoadMatrix(network):
     demand_matrix = network.DemandMatrix
     capacity_matrix = network.CapacityMatrix
+
+    network.LoadMatrix = np.zeros(shape=np.shape(demand_matrix))
 
     for router in network.Routers:
         for i in range(len(network.LoadMatrix)):
@@ -72,18 +77,15 @@ def computeLoadMatrix(network):
                     for dest,paths in links.items():
                         cost = demand_matrix[router.ID][dest]
                         for path in paths:
-                            if len(path) == 1:
-                                network.LoadMatrix[router.ID][dest] += cost
-                            for k in range(len(path)):
-                                if k < len(path) - 1:
-                                    network.LoadMatrix[path[k]][path[k+1]] += cost
-                                    network.LoadMatrix[path[k+1]][path[k]] += cost
+                            network.LoadMatrix[i][j] += cost
+
     #Compute the proportions
+
+    """ problem if we have to add after
     for i in range(len(network.LoadMatrix)):
         for j in range(len(network.LoadMatrix)):
             network.LoadMatrix[i][j] /= capacity_matrix[i][j]
-
-
+    """
 
 def loadLink(link, loadMatrix):
     """

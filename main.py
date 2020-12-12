@@ -34,14 +34,12 @@ if __name__ == "__main__":
     mat_dem = 10*np.ones(shape=np.shape(mat_adj2_cor))
 
     mySimpleNetwork = Network(mat_adj2_cor,mat_dem)
-    """
-    print(mySimpleNetwork.getAllRouterIDs())
     mySimpleNetwork.nDijkstra()
-    mySimpleNetwork.getAllShortestPath()
     computeLoadMatrix(mySimpleNetwork)
-    print("loadMatrix : \n", mySimpleNetwork.LoadMatrix)
-    """
-    print(mySimpleNetwork.DemandMatrix, "\n")
-    disturbNetwork(mySimpleNetwork, 4)
-    print(mySimpleNetwork.DemandMatrix)
+    print("\n\nloadMatrix : \n", mySimpleNetwork.LoadMatrix)
+    disturbNetwork(mySimpleNetwork,1)
+    print('\n',mySimpleNetwork.DemandMatrix)
+    print("\n\nloadMatrix : \n\n", mySimpleNetwork.LoadMatrix)
+
+
 
