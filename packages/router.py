@@ -56,7 +56,8 @@ class Router:
                             self.shortest_paths[Destination][1] == math.inf:  # same costly route
                         for OldRoute in self.shortest_paths[NextHop][0]:
                             NewRoute = OldRoute + [Destination]
-                            self.shortest_paths[Destination][0].append(NewRoute)
+                            if NewRoute not in self.shortest_paths[Destination][0]:
+                                self.shortest_paths[Destination][0].append(NewRoute)
                         NextHops.append(Destination)
                 NextHops.remove(NextHop)
 
@@ -97,7 +98,8 @@ class Router:
                             sp[Destination][1] == math.inf:  # same costly route
                         for OldRoute in sp[NextHop][0]:
                             NewRoute = OldRoute + [Destination]
-                            sp[Destination][0].append(NewRoute)
+                            if NewRoute not in sp[Destination][0]:
+                                sp[Destination][0].append(NewRoute)
                         NextHops.append(Destination)
                 NextHops.remove(NextHop)
 

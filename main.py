@@ -8,26 +8,26 @@ import math
 
 if __name__ == "__main__":
     mat_adj = computeModel("inputs/france.gml")
-    #print("Matrice d'adjacence : ")
-    #print(mat_adj)
+    # print("Matrice d'adjacence : ")
+    # print(mat_adj)
 
     """Test with a simple network"""
     mat_adj2 = np.array([
-        [0,4,0,0,0,0],
-        [4,0,3,6,0,2],
-        [0,3,0,0,1,0],
-        [0,6,0,0,2,0],
-        [0,0,1,2,0,5],
-        [0,2,0,0,5,0]
+        [0, 4, 0, 0, 0, 0],
+        [4, 0, 3, 6, 0, 2],
+        [0, 3, 0, 0, 1, 0],
+        [0, 6, 0, 0, 2, 0],
+        [0, 0, 1, 2, 0, 5],
+        [0, 2, 0, 0, 5, 0]
     ])
 
     mat_adj2_cor = np.array([
-        [math.inf,4,math.inf,math.inf,math.inf,math.inf],
-        [4,math.inf,3,6,math.inf,2],
-        [math.inf,3,math.inf,math.inf,1,math.inf],
-        [math.inf,6,math.inf,math.inf,2,math.inf],
-        [math.inf,math.inf,1,2,math.inf,5],
-        [math.inf,2,math.inf,math.inf,5,math.inf]
+        [math.inf, 4, math.inf, math.inf, math.inf, math.inf],
+        [4, math.inf, 3, 6, math.inf, 2],
+        [math.inf, 3, math.inf, math.inf, 1, math.inf],
+        [math.inf, 6, math.inf, math.inf, 2, math.inf],
+        [math.inf, math.inf, 1, 2, math.inf, 5],
+        [math.inf, 2, math.inf, math.inf, 5, math.inf]
     ])
 
         #Create a random demand matrix within a link's load can not exceed 70
@@ -44,3 +44,4 @@ if __name__ == "__main__":
     print(mySimpleNetwork.DemandMatrix, "\n")
     disturbNetwork(mySimpleNetwork, 4)
     print(mySimpleNetwork.DemandMatrix)
+
