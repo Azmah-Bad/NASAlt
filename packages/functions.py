@@ -52,15 +52,17 @@ def disturbNetwork(network, nb):
     :param nb: number of perturbations
     :return: void
     """
-    demand_matrix = network.DemandMatrix
     capacity_matrix = network.CapacityMatrix
 
     for k in range(nb):
-        i = randint(1, len(demand_matrix) - 1)
-        j = randint(1, len(demand_matrix) - 1)
-        demand_matrix[i][j] += randint(1, capacity_matrix[i][j] / 2) # maybe start at a lower value than 1 to have a real impact
+        i = randint(1, len(network.DemandMatrix) - 1)
+        j = randint(1, len(network.DemandMatrix) - 1)
+        additional_load = randint(1, capacity_matrix[i][j] / 2) # maybe start at a lower value than 1 to have a real impact
+        network.DemandMatrix[i][j] += additional_load
+        network.DemandMatrix[j][i] += additional_load
 
-    #computeLoadMatrix(network) pb : asymetric loadmatrix when i compute
+    network.nDijkstra()
+    computeLoadMatrix(network)
 
 
 def computeLoadMatrix(network):

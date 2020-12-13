@@ -37,7 +37,7 @@ if __name__ == "__main__":
     mySimpleNetwork.nDijkstra()
     computeLoadMatrix(mySimpleNetwork)
     print("\n\nloadMatrix : \n", mySimpleNetwork.LoadMatrix)
-    disturbNetwork(mySimpleNetwork,1)
+    disturbNetwork(mySimpleNetwork,9)
     print('\n',mySimpleNetwork.DemandMatrix)
     print("\n\nloadMatrix : \n\n", mySimpleNetwork.LoadMatrix)
 
