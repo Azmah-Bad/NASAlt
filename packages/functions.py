@@ -99,7 +99,7 @@ def loadLink(link, loadMatrix):
     return loadMatrix[link[0]][link[1]]
 
 
-def computeModel(filename):
+def computeModelGML(filename):
     """construct the adjecency matrix of a graph descripted in the format used by http://sndlib.zib.de/home.action
             input : filename = relative or absolute path to the description of the graph
             output : adjMat = adjacency marix of the graph
@@ -126,6 +126,42 @@ def computeModel(filename):
         adjMat[src][dest] = 1
 
     return adjMat
+
+def computeModelTXT(filename):
+
+    if os.path.exists(filename):
+        try:
+            with open(filename) as f:
+                content  = f.read()
+        except IOError:
+            print("[computeModel] : erreur de lecture du fichier source\n")
+    else:
+        print('Le fichier n\'existe pas')
+        return -1
+
+    nameToID = {}
+    i=0
+    [nodes, edges] = content.split("# LINK SECTION",1)
+    nodes = nodes.split('#')[-1].split("NODES (")[1].split('\n')
+    for oneNode in nodes:
+        name = oneNode.split('(',1)[0]
+        if len(name) > 0 and name != ')':
+            name = name.replace(' ','')
+            nameToID[name] = i
+            i+=1
+    adjMat = np.zeros(dtype=np.uint8, shape=(i, i))
+
+    edges = edges.split("LINKS (")[1].split("# DEMAND SECTION")[0].split('\n')
+    for oneEdge in edges:
+        name = oneEdge.split('(')[0].replace(' ','')
+        if len(name) > 0 and name != ')':
+            names = name.split('_')
+            adjMat[nameToID[names[0]]][nameToID[names[1]]] = 1
+            adjMat[nameToID[names[1]]][nameToID[names[0]]] = 1
+
+    return adjMat
+
+            
 
 
 def isSaturated(lMatrix):
