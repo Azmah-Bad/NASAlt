@@ -1,5 +1,6 @@
 from .router import Router
 import numpy as np
+from functions import isSaturated
 
 
 class Network:
@@ -41,10 +42,7 @@ class Network:
         Return all the RouterIDs of the network
         :return: array of int corresponding to the RouterIDs
         """
-        allRouterIDs = []
-        for router in self.Routers:
-            allRouterIDs.append(router.ID)
-        return allRouterIDs
+        return [Router.ID for Router in self.Routers]
 
     def getAllShortestPath(self):
         """
@@ -53,4 +51,8 @@ class Network:
         for router in self.Routers:
             print("#", router.ID, "\n", router.shortest_paths, "\n")
         return 1
+
+    def isCongested(self) -> bool:
+        return isSaturated(self.DemandMatrix)
+
 
