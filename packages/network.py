@@ -4,22 +4,18 @@ from functions import isSaturated
 
 
 class Network:
-    def __init__(self, AdjacencyMatrix, DemandMatrix):
+
+    def __init__(self, AdjacencyMatrix, DemandMatrix, capacityMatrix = None):
         self.AdjacencyMatrix = AdjacencyMatrix
         self.Routers = []
+        self.DemandMatrix = DemandMatrix
 
         for ID in range(len(AdjacencyMatrix)):
             self.Routers.append(Router(ID, AdjacencyMatrix, DemandMatrix))
-        self.CapacityMatrix = 10*np.ones(shape=np.shape(AdjacencyMatrix))
-        self.LoadMatrix = np.zeros(shape=np.shape(AdjacencyMatrix))
-
-    def __init__(self, AdjacencyMatrix, DemandMatrix, capacityMatrix):
-        self.AdjacencyMatrix = AdjacencyMatrix
-        self.Routers = []
-
-        for ID in range(len(AdjacencyMatrix)):
-            self.Routers.append(Router(ID, AdjacencyMatrix, DemandMatrix))
-        self.CapacityMatrix = capacityMatrix
+        if capacityMatrix is None:
+            self.CapacityMatrix = 10 * np.ones(shape=np.shape(AdjacencyMatrix))
+        else :
+            self.CapacityMatrix = capacityMatrix
         self.LoadMatrix = np.zeros(shape=np.shape(AdjacencyMatrix))
 
     def getRouterByID(self, ID: int) -> Router or None:
@@ -57,6 +53,6 @@ class Network:
         return 1
 
     def isCongested(self) -> bool:
-        return isSaturated(self.CapacityMatrix)
+        return isSaturated(self.DemandMatrix)
 
 
