@@ -30,10 +30,16 @@ if __name__ == "__main__":
         [math.inf, 2, math.inf, math.inf, 5, math.inf]
     ])
 
-    # Create a random demand matrix within a link's load can not exceed 70
-    mat_dem = np.random.randint(70, size=(6, 6))
+        #Create a random demand matrix within a link's load can not exceed 70
+    mat_dem = 10*np.ones(shape=np.shape(mat_adj2_cor))
 
-    mySimpleNetwork = Network(mat_adj2_cor, mat_dem, [[]])
-    print(mySimpleNetwork.getAllRouterIDs())
+    mySimpleNetwork = Network(mat_adj2_cor,mat_dem)
     mySimpleNetwork.nDijkstra()
-    mySimpleNetwork.getAllShortestPath()
+    computeLoadMatrix(mySimpleNetwork)
+    print("\n\nloadMatrix : \n", mySimpleNetwork.LoadMatrix)
+    disturbNetwork(mySimpleNetwork,9)
+    print('\n',mySimpleNetwork.DemandMatrix)
+    print("\n\nloadMatrix : \n\n", mySimpleNetwork.LoadMatrix)
+
+
+

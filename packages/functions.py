@@ -10,13 +10,25 @@ def isThereLink(router, link):
     check if a link exists
     :param router: an object Router
     :param link: a tuple corresponding to a link ( ex: (1,3) )
-    :return: -1 if the link does not exist, (int) router_id of the dest we want to reach using this link
+    :return dictionary: keys = (int) router_id of the dest we want to reach using this link | value = array of paths
+        (= array of int) which contain the link
     """
-    for dest, path in router.shortest_paths.items():
-        for j in range(len(path)):
-            if j < len(path) - 1 and path[j] == link[0] and path[j + 1] == link[1]:
-                return int(dest)
-    return -1
+    res = {}
+    if router.ID == link[0]:
+        if link[1] in router.neighbors:
+            return {link[1]: [[1]]}
+    for dest, paths in router.shortest_paths.items():
+        paths_to_add = []
+        for path in paths[0]:
+            if len(path) == 1 and router.ID == link[0] and link[1] in router.neighbors:
+                        paths_to_add.append([[ link[1] ]])
+            for j in range(len(path)):
+                if (j < len(path) - 1 and path[j] == link[0] and path[j + 1] == link[1]) or (j < len(path) - 1 and path[j+1] == link[0] and path[j] == link[1]):
+                    paths_to_add.append(path)
+        if paths_to_add != []:
+            res[dest] = paths_to_add
+            paths_to_add = []
+    return res
 
 
 def howManySP(router, dest):
@@ -29,28 +41,62 @@ def howManySP(router, dest):
     if dest not in router.shortest_paths.keys():
         return 0
     else:
-        return len(router.shortest_path[
-            dest])  # discuss of the structure of router.shortest_path, especially when there are several paths
+        return len(router.shortest_paths[dest][
+                       0])  # discuss of the structure of router.shortest_path, especially when there are several paths
 
 
-def loadLink(routers, dem_mat, link):
+def disturbNetwork(network, nb):
+    """
+    Increase randomly links load on the network
+    :param network: an object Network
+    :param nb: number of perturbations
+    :return: void
+    """
+    capacity_matrix = network.CapacityMatrix
+
+    for k in range(nb):
+        i = randint(1, len(network.DemandMatrix) - 1)
+        j = randint(1, len(network.DemandMatrix) - 1)
+        additional_load = randint(1, capacity_matrix[i][j] / 2) # maybe start at a lower value than 1 to have a real impact
+        network.DemandMatrix[i][j] += additional_load
+        network.DemandMatrix[j][i] += additional_load
+
+    network.nDijkstra()
+    computeLoadMatrix(network)
+
+
+def computeLoadMatrix(network):
+    demand_matrix = network.DemandMatrix
+    capacity_matrix = network.CapacityMatrix
+
+    network.LoadMatrix = np.zeros(shape=np.shape(demand_matrix))
+
+    for router in network.Routers:
+        for i in range(len(network.LoadMatrix)):
+            for j in range(len(network.LoadMatrix)):
+                links = isThereLink( router, (i, j) )
+                if links != {}:
+                    for dest,paths in links.items():
+                        cost = demand_matrix[router.ID][dest]
+                        for path in paths:
+                            network.LoadMatrix[i][j] += cost
+
+    #Compute the proportions
+
+    """ problem if we have to add after
+    for i in range(len(network.LoadMatrix)):
+        for j in range(len(network.LoadMatrix)):
+            network.LoadMatrix[i][j] /= capacity_matrix[i][j]
+    """
+
+def loadLink(link, loadMatrix):
     """
     check the charge of a link by finding all the routers which use this link
-    :param router: an object Router
-    :param demand_mat: square matrix of int
+    :param loadMatrix: an square array corresponding to the loadMatrix of the network
     :param link: a tuple corresponding to a link ( ex: (1,3) )
     :return: int>0 charge of a link
     """
-    charge = 0
-    value = 0
-    for r in routers:  # browse the routers
-        dest = isThereLink(r, link)
-        if dest != -1:
-            nb_shortest_paths = howManySP(router, dest)
-            value = dem_mat[r.router_id][
-                        dest] / nb_shortest_paths  # ECMP if there is several shortest paths to reach a dest
-            charge += value
-    return charge
+    return loadMatrix[link[0]][link[1]]
 
 
 def computeModel(filename):
@@ -80,6 +126,7 @@ def computeModel(filename):
         adjMat[src][dest] = 1
 
     return adjMat
+
 
 def isSaturated(lMatrix):
     """
