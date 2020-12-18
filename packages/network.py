@@ -1,5 +1,6 @@
 from .router import Router
 import numpy as np
+from functions import isSaturated
 
 
 class Network:
@@ -55,7 +56,7 @@ class Network:
             print("#", router.ID, "\n", router.shortest_paths, "\n")
         return 1
 
-    def isCongested(self) -> bool:  # TODO :: how are capacity matrix are handled ?
-        raise NotImplementedError
+    def isCongested(self) -> bool:
+        return isSaturated(self.CapacityMatrix)
 
 
