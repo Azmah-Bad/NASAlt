@@ -21,9 +21,10 @@ def isThereLink(router, link):
         paths_to_add = []
         for path in paths[0]:
             if len(path) == 1 and router.ID == link[0] and link[1] in router.neighbors:
-                        paths_to_add.append([[ link[1] ]])
+                paths_to_add.append([[link[1]]])
             for j in range(len(path)):
-                if (j < len(path) - 1 and path[j] == link[0] and path[j + 1] == link[1]) or (j < len(path) - 1 and path[j+1] == link[0] and path[j] == link[1]):
+                if (j < len(path) - 1 and path[j] == link[0] and path[j + 1] == link[1]) or (
+                        j < len(path) - 1 and path[j + 1] == link[0] and path[j] == link[1]):
                     paths_to_add.append(path)
         if paths_to_add != []:
             res[dest] = paths_to_add
@@ -57,7 +58,8 @@ def disturbNetwork(network, nb):
     for k in range(nb):
         i = randint(1, len(network.DemandMatrix) - 1)
         j = randint(1, len(network.DemandMatrix) - 1)
-        additional_load = randint(1, capacity_matrix[i][j] / 2) # maybe start at a lower value than 1 to have a real impact
+        additional_load = randint(1, capacity_matrix[i][
+            j] / 2)  # maybe start at a lower value than 1 to have a real impact
         network.DemandMatrix[i][j] += additional_load
         network.DemandMatrix[j][i] += additional_load
 
@@ -74,20 +76,21 @@ def computeLoadMatrix(network):
     for router in network.Routers:
         for i in range(len(network.LoadMatrix)):
             for j in range(len(network.LoadMatrix)):
-                links = isThereLink( router, (i, j) )
+                links = isThereLink(router, (i, j))
                 if links != {}:
-                    for dest,paths in links.items():
+                    for dest, paths in links.items():
                         cost = demand_matrix[router.ID][dest]
                         for path in paths:
                             network.LoadMatrix[i][j] += cost
 
-    #Compute the proportions
+    # Compute the proportions
 
     """ problem if we have to add after
     for i in range(len(network.LoadMatrix)):
         for j in range(len(network.LoadMatrix)):
             network.LoadMatrix[i][j] /= capacity_matrix[i][j]
     """
+
 
 def loadLink(link, loadMatrix):
     """
@@ -135,8 +138,9 @@ def isSaturated(lMatrix):
     """
     saturated = np.where(lMatrix >= 100)
     if saturated[0].size > 0:
-        return list(zip(saturated[0],saturated[1]))
+        return list(zip(saturated[0], saturated[1]))
     return -1
+
 
 def getMaxLoad(lMatrix):
     """
@@ -146,4 +150,4 @@ def getMaxLoad(lMatrix):
     value = np.amax(lMatrix)
     indexes = np.where(lMatrix == value)
     indexes = list(zip(indexes[0], indexes[1]))
-    return {value : indexes}
+    return {value: indexes}

@@ -3,7 +3,6 @@ import numpy as np
 
 
 class Network:
-
     def __init__(self, AdjacencyMatrix, DemandMatrix, capacityMatrix=None):
         self.AdjacencyMatrix = AdjacencyMatrix
         self.Routers = []
@@ -11,9 +10,9 @@ class Network:
 
         for ID in range(len(AdjacencyMatrix)):
             self.Routers.append(Router(ID, AdjacencyMatrix, DemandMatrix))
-        if capacityMatrix == None:
-            self.CapacityMatrix = 10*np.ones(shape=np.shape(AdjacencyMatrix))
-        else :
+        if capacityMatrix is None:
+            self.CapacityMatrix = 10 * np.ones(shape=np.shape(AdjacencyMatrix))
+        else:
             self.CapacityMatrix = capacityMatrix
         self.LoadMatrix = np.zeros(shape=np.shape(AdjacencyMatrix))
 
@@ -53,4 +52,3 @@ class Network:
         for router in self.Routers:
             print("#", router.ID, "\n", router.shortest_paths, "\n")
         return 1
-
