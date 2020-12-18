@@ -5,15 +5,15 @@ from functions import isSaturated
 
 class Network:
 
-    def __init__(self, AdjacencyMatrix, DemandMatrix, capacityMatrix = None):
+    def __init__(self, AdjacencyMatrix, DemandMatrix, capacityMatrix=None):
         self.AdjacencyMatrix = AdjacencyMatrix
         self.Routers = []
         self.DemandMatrix = DemandMatrix
 
         for ID in range(len(AdjacencyMatrix)):
             self.Routers.append(Router(ID, AdjacencyMatrix, DemandMatrix))
-        if capacityMatrix is None:
-            self.CapacityMatrix = 10 * np.ones(shape=np.shape(AdjacencyMatrix))
+        if capacityMatrix == None:
+            self.CapacityMatrix = 10*np.ones(shape=np.shape(AdjacencyMatrix))
         else :
             self.CapacityMatrix = capacityMatrix
         self.LoadMatrix = np.zeros(shape=np.shape(AdjacencyMatrix))
