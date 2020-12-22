@@ -100,7 +100,7 @@ def loadLink(link, loadMatrix):
 
 
 def computeModelGML(filename):
-    """construct the adjecency matrix of a graph descripted in the format used by http://sndlib.zib.de/home.action
+    """construct the adjecency matrix of a graph descripted in the format used by http://sndlib.zib.de/home.action in GML files
             input : filename = relative or absolute path to the description of the graph
             output : adjMat = adjacency marix of the graph
     """
@@ -110,7 +110,7 @@ def computeModelGML(filename):
             with open(filename) as f:
                 content = f.read()
         except IOError:
-            print("[computeModel] : erreur de lecture du fichier source\n")
+            print("[computeModelGML] : erreur de lecture du fichier source\n")
     else:
         return -1
 
@@ -127,14 +127,20 @@ def computeModelGML(filename):
 
     return adjMat
 
-def computeModelTXT(filename):
+def computeModelTXT(filename, getDemand: bool = True):
+    """construct the adjecency matrix of a graph descripted in the format used by http://sndlib.zib.de/home.action in native files
+        input : filename = relative or absolute path to the description of the graph
+                getDemand = boolean that indicates whether or not the function should return the demand descripted in the file
+        output : adjMat = adjacency matrix of the graph
+                 demandMatrix = demand matrix of the file (if True) or np.zeros
+    """
 
     if os.path.exists(filename):
         try:
             with open(filename) as f:
                 content  = f.read()
         except IOError:
-            print("[computeModel] : erreur de lecture du fichier source\n")
+            print("[computeModelTXT] : erreur de lecture du fichier source\n")
     else:
         print('Le fichier n\'existe pas')
         return -1
@@ -159,9 +165,22 @@ def computeModelTXT(filename):
             adjMat[nameToID[names[0]]][nameToID[names[1]]] = 1
             adjMat[nameToID[names[1]]][nameToID[names[0]]] = 1
 
-    return adjMat
+    #WARNING : add capacity ?
+    demandMatrix = np.zeros(dtype=np.uint64, shape=(i,i))
+    if getDemand:
+        demandDesc = content.split("DEMANDS (\n",1)[1].split('\n')
+        for oneDemand in demandDesc:
+            if len(oneDemand) < 5:
+                break
+            names = oneDemand.split('_')
+            names[0] = names[0].replace(' ','')
+            print(names)
+            dValue = names[1].split(') ')[1].split(' ')[1].split('.')[0]
+            names[1] = names[1].split(' ')[0]
+            print(names[1])
+            demandMatrix[nameToID[names[0]],nameToID[names[1]]]=int(dValue)
 
-            
+    return adjMat, demandMatrix
 
 
 def isSaturated(lMatrix):
