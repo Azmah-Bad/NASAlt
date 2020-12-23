@@ -127,10 +127,11 @@ def computeModelGML(filename):
 
     return adjMat
 
-def computeModelTXT(filename, getDemand: bool = True):
+def computeModelTXT(filename, getDemand: bool = True, getCapacity: bool = True):
     """construct the adjecency matrix of a graph descripted in the format used by http://sndlib.zib.de/home.action in native files
         input : filename = relative or absolute path to the description of the graph
                 getDemand = boolean that indicates whether or not the function should return the demand descripted in the file
+                getCapacity = boolean that indicates whether or not the function should return the capaciy matrix described in file
         output : adjMat = adjacency matrix of the graph
                  demandMatrix = demand matrix of the file (if True) or np.zeros
     """
@@ -156,16 +157,19 @@ def computeModelTXT(filename, getDemand: bool = True):
             nameToID[name] = i
             i+=1
     adjMat = np.zeros(dtype=np.uint8, shape=(i, i))
-
+    capMat = np.zeros(dtype=np.uint64, shape=(i,i))
     edges = edges.split("LINKS (")[1].split("# DEMAND SECTION")[0].split('\n')
     for oneEdge in edges:
         name = oneEdge.split('(')[0].replace(' ','')
         if len(name) > 0 and name != ')':
+            cap = oneEdge.split(') ')[1].split(' ',1)[0].split('.')[0]
             names = name.split('_')
             adjMat[nameToID[names[0]]][nameToID[names[1]]] = 1
             adjMat[nameToID[names[1]]][nameToID[names[0]]] = 1
+            capMat[nameToID[names[0]]][nameToID[names[1]]] = cap
+            capMat[nameToID[names[1]]][nameToID[names[0]]] = cap
+            
 
-    #WARNING : add capacity ?
     demandMatrix = np.zeros(dtype=np.uint64, shape=(i,i))
     if getDemand:
         demandDesc = content.split("DEMANDS (\n",1)[1].split('\n')
@@ -180,7 +184,7 @@ def computeModelTXT(filename, getDemand: bool = True):
             print(names[1])
             demandMatrix[nameToID[names[0]],nameToID[names[1]]]=int(dValue)
 
-    return adjMat, demandMatrix
+    return adjMat, capMat, demandMatrix
 
 
 def isSaturated(lMatrix):

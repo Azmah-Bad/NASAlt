@@ -41,7 +41,10 @@ if __name__ == "__main__":
     print('\n',mySimpleNetwork.DemandMatrix)
     print("\n\nloadMatrix : \n\n", mySimpleNetwork.LoadMatrix)
 
-    #print(computeModelTXT('./inputs/abilene.txt'))
+    """[a,c,d] = computeModelTXT('./inputs/abilene.txt')
+    print("adj =\n",a)
+    print('cap =\n',c)
+    print('demand =\n',d)"""
 
 
 
