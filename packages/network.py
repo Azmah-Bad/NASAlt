@@ -1,5 +1,6 @@
 from .router import Router
 import numpy as np
+from packages.functions import *
 
 
 class Network:
@@ -16,6 +17,7 @@ class Network:
         else :
             self.CapacityMatrix = capacityMatrix
         self.LoadMatrix = np.zeros(shape=np.shape(AdjacencyMatrix))
+        computeLoadMatrix(self)
 
     def getRouterByID(self, ID: int) -> Router or None:
         """
@@ -34,6 +36,7 @@ class Network:
         """
         for router in self.Routers:
             router.dijkstra()
+        computeLoadMatrix(self)
         return 1
 
     def getAllRouterIDs(self):

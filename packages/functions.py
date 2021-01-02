@@ -45,7 +45,7 @@ def howManySP(router, dest):
                        0])  # discuss of the structure of router.shortest_path, especially when there are several paths
 
 
-def disturbNetwork(network, nb):
+def disturbNetwork(network):
     """
     Increase randomly links load on the network
     :param network: an object Network
@@ -54,15 +54,13 @@ def disturbNetwork(network, nb):
     """
     capacity_matrix = network.CapacityMatrix
 
-    for k in range(nb):
+    while( isSaturated(network.LoadMatrix) == -1) :
         i = randint(1, len(network.DemandMatrix) - 1)
         j = randint(1, len(network.DemandMatrix) - 1)
-        additional_load = randint(1, capacity_matrix[i][j] / 2) # maybe start at a lower value than 1 to have a real impact
-        network.DemandMatrix[i][j] += additional_load
-        network.DemandMatrix[j][i] += additional_load
-
-    network.nDijkstra()
-    computeLoadMatrix(network)
+        additional_load = randint( int(capacity_matrix[i][j] /3), int(3*capacity_matrix[i][j] / 4)) # maybe start at a lower value than 1 to have a real impact
+        network.DemandMatrix[i][j] += additional_load/network.CapacityMatrix[i][j]
+        network.DemandMatrix[j][i] += additional_load/network.CapacityMatrix[i][j]
+        network.nDijkstra()
 
 
 def computeLoadMatrix(network):
@@ -79,15 +77,9 @@ def computeLoadMatrix(network):
                     for dest,paths in links.items():
                         cost = demand_matrix[router.ID][dest]
                         for path in paths:
-                            network.LoadMatrix[i][j] += cost
+                            network.LoadMatrix[i][j] += cost/capacity_matrix[i][j] * 100
 
-    #Compute the proportions
-
-    """ problem if we have to add after
-    for i in range(len(network.LoadMatrix)):
-        for j in range(len(network.LoadMatrix)):
-            network.LoadMatrix[i][j] /= capacity_matrix[i][j]
-    """
+    network.LoadMatrix = np.around(network.LoadMatrix, decimals=1)
 
 def loadLink(link, loadMatrix):
     """
