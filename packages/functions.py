@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 
+from .network import Network
 from random import *
 import numpy as np
 import os
+import math
 
 
 def isThereLink(router, link):
@@ -45,7 +47,7 @@ def howManySP(router, dest):
                        0])  # discuss of the structure of router.shortest_path, especially when there are several paths
 
 
-def disturbNetwork(network, nb):
+def disturbNetwork(network):
     """
     Increase randomly links load on the network
     :param network: an object Network
@@ -54,15 +56,13 @@ def disturbNetwork(network, nb):
     """
     capacity_matrix = network.CapacityMatrix
 
-    for k in range(nb):
+    while( isSaturated(network.LoadMatrix) == -1) :
         i = randint(1, len(network.DemandMatrix) - 1)
         j = randint(1, len(network.DemandMatrix) - 1)
-        additional_load = randint(1, capacity_matrix[i][j] / 2) # maybe start at a lower value than 1 to have a real impact
-        network.DemandMatrix[i][j] += additional_load
-        network.DemandMatrix[j][i] += additional_load
-
-    network.nDijkstra()
-    computeLoadMatrix(network)
+        additional_load = randint( int(capacity_matrix[i][j] /3), int(3*capacity_matrix[i][j] / 4)) # maybe start at a lower value than 1 to have a real impact
+        network.DemandMatrix[i][j] += additional_load/network.CapacityMatrix[i][j]
+        network.DemandMatrix[j][i] += additional_load/network.CapacityMatrix[i][j]
+        network.nDijkstra()
 
 
 def computeLoadMatrix(network):
@@ -79,15 +79,9 @@ def computeLoadMatrix(network):
                     for dest,paths in links.items():
                         cost = demand_matrix[router.ID][dest]
                         for path in paths:
-                            network.LoadMatrix[i][j] += cost
+                            network.LoadMatrix[i][j] += cost/capacity_matrix[i][j] * 100
 
-    #Compute the proportions
-
-    """ problem if we have to add after
-    for i in range(len(network.LoadMatrix)):
-        for j in range(len(network.LoadMatrix)):
-            network.LoadMatrix[i][j] /= capacity_matrix[i][j]
-    """
+    network.LoadMatrix = np.around(network.LoadMatrix, decimals=1)
 
 def loadLink(link, loadMatrix):
     """
@@ -99,8 +93,8 @@ def loadLink(link, loadMatrix):
     return loadMatrix[link[0]][link[1]]
 
 
-def computeModelGML(filename):
-    """construct the adjecency matrix of a graph descripted in the format used by http://sndlib.zib.de/home.action in GML files
+def computeModel(filename):
+    """construct the adjecency matrix of a graph descripted in the format used by http://sndlib.zib.de/home.action
             input : filename = relative or absolute path to the description of the graph
             output : adjMat = adjacency marix of the graph
     """
@@ -110,7 +104,7 @@ def computeModelGML(filename):
             with open(filename) as f:
                 content = f.read()
         except IOError:
-            print("[computeModelGML] : erreur de lecture du fichier source\n")
+            print("[computeModel] : erreur de lecture du fichier source\n")
     else:
         return -1
 
@@ -245,3 +239,20 @@ def getMaxLoad(lMatrix):
     indexes = np.where(lMatrix == value)
     indexes = list(zip(indexes[0], indexes[1]))
     return {value : indexes}
+
+
+def networkFromList(a_list):
+    """
+    Compute a network from a 1D list that contains an adjacency matrix, a demand matrix and a load matrix
+    :return: Network
+    """
+
+    #get the different matrix in a 1D vector
+    adjacency_matrix = np.array(a_list[0:int(len(a_list)/3)])
+    demand_matrix = np.array(a_list[int(len(a_list)/3):int(2*len(a_list)/3)])
+
+    #reshape
+    adjacency_matrix = adjacency_matrix.reshape(int(math.sqrt(len(adjacency_matrix))),int(math.sqrt(len(adjacency_matrix))))
+    demand_matrix = demand_matrix.reshape(int(math.sqrt(len(demand_matrix))),int(math.sqrt(len(demand_matrix))))
+
+    network = Network(adjacency_matrix,demand_matrix)

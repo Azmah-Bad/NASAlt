@@ -1,6 +1,11 @@
 from .router import Router
 import numpy as np
+<<<<<<< HEAD
 from .functions import isSaturated
+=======
+from packages.functions import isSaturated
+
+>>>>>>> 593bdcf3754dd5e9f1016f9590163618237ba5f4
 
 
 class Network:
@@ -17,6 +22,8 @@ class Network:
         else :
             self.CapacityMatrix = capacityMatrix
         self.LoadMatrix = np.zeros(shape=np.shape(AdjacencyMatrix))
+        self.nDijkstra()
+        computeLoadMatrix(self)
 
     def getRouterByID(self, ID: int) -> Router or None:
         """
@@ -64,5 +71,7 @@ class Network:
     if saturated[0].size > 0:
         return list(zip(saturated[0],saturated[1]))
     return -1
+
+
 
 

@@ -7,7 +7,7 @@ import numpy as np
 import math
 
 if __name__ == "__main__":
-    #mat_adj = computeModelGML("inputs/france.gml")
+    # mat_adj = computeModelGML("inputs/france.gml")
     # print("Matrice d'adjacence : ")
     # print(mat_adj)
 
@@ -30,21 +30,20 @@ if __name__ == "__main__":
         [math.inf, 2, math.inf, math.inf, 5, math.inf]
     ])
 
-        #Create a random demand matrix within a link's load can not exceed 70
-    mat_dem = 10*np.ones(shape=np.shape(mat_adj2_cor))
+    # Create a random demand matrix within a link's load can not exceed 70
+    mat_dem = 10 * np.ones(shape=np.shape(mat_adj2_cor))
 
-    mySimpleNetwork = Network(mat_adj2_cor,mat_dem)
+    mySimpleNetwork = Network(mat_adj2_cor, mat_dem)
     mySimpleNetwork.nDijkstra()
     computeLoadMatrix(mySimpleNetwork)
     print("\n\nloadMatrix : \n", mySimpleNetwork.LoadMatrix)
-    disturbNetwork(mySimpleNetwork,9)
-    print('\n',mySimpleNetwork.DemandMatrix)
+    disturbNetwork(mySimpleNetwork, 9)
+    print('\n', mySimpleNetwork.DemandMatrix)
     print("\n\nloadMatrix : \n\n", mySimpleNetwork.LoadMatrix)
 
     """[a,c,d] = computeModelTXT('./inputs/abilene.txt')
     print("adj =\n",a)
     print('cap =\n',c)
     print('demand =\n',d)"""
-
 
 
