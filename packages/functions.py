@@ -212,7 +212,7 @@ def getDataset(filename):
             return -1
     ds = []
     for oneD in demands:
-        ds.append((adjacency,oneD,capacity)
+        ds.append((adjacency,oneD,capacity))
         
     ds = np.array(ds)
 
