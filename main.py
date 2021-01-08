@@ -7,7 +7,7 @@ import numpy as np
 import math
 
 if __name__ == "__main__":
-    mat_adj = computeModel("inputs/france.gml")
+    #mat_adj = computeModelGML("inputs/france.gml")
     # print("Matrice d'adjacence : ")
     # print(mat_adj)
 
@@ -40,6 +40,11 @@ if __name__ == "__main__":
     disturbNetwork(mySimpleNetwork,9)
     print('\n',mySimpleNetwork.DemandMatrix)
     print("\n\nloadMatrix : \n\n", mySimpleNetwork.LoadMatrix)
+
+    """[a,c,d] = computeModelTXT('./inputs/abilene.txt')
+    print("adj =\n",a)
+    print('cap =\n',c)
+    print('demand =\n',d)"""
 
 
 
