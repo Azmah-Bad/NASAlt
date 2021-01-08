@@ -1,6 +1,7 @@
 from .router import Router
 import numpy as np
-from functions import isSaturated
+from packages.functions import isSaturated
+
 
 
 class Network:
@@ -17,6 +18,8 @@ class Network:
         else :
             self.CapacityMatrix = capacityMatrix
         self.LoadMatrix = np.zeros(shape=np.shape(AdjacencyMatrix))
+        self.nDijkstra()
+        computeLoadMatrix(self)
 
     def getRouterByID(self, ID: int) -> Router or None:
         """
@@ -54,5 +57,7 @@ class Network:
 
     def isCongested(self) -> bool:
         return isSaturated(self.DemandMatrix)
+
+
 
 

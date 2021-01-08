@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 
+from .network import Network
 from random import *
 import numpy as np
 import os
+import math
 
 
 def isThereLink(router, link):
@@ -139,3 +141,20 @@ def getMaxLoad(lMatrix):
     indexes = np.where(lMatrix == value)
     indexes = list(zip(indexes[0], indexes[1]))
     return {value : indexes}
+
+
+def networkFromList(a_list):
+    """
+    Compute a network from a 1D list that contains an adjacency matrix, a demand matrix and a load matrix
+    :return: Network
+    """
+
+    #get the different matrix in a 1D vector
+    adjacency_matrix = np.array(a_list[0:int(len(a_list)/3)])
+    demand_matrix = np.array(a_list[int(len(a_list)/3):int(2*len(a_list)/3)])
+
+    #reshape
+    adjacency_matrix = adjacency_matrix.reshape(int(math.sqrt(len(adjacency_matrix))),int(math.sqrt(len(adjacency_matrix))))
+    demand_matrix = demand_matrix.reshape(int(math.sqrt(len(demand_matrix))),int(math.sqrt(len(demand_matrix))))
+
+    network = Network(adjacency_matrix,demand_matrix)
