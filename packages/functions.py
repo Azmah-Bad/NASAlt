@@ -198,7 +198,7 @@ def getDataset(filename):
         return -1
     try :
         demandFiles = os.listdir('demands-'+filename.split('.',1)[0])
-    except FileNotFoundError e:
+    except FileNotFoundError:
         print("[getDataset] : cannot list demand files with repo_name=",'demands-'+filename.split('.',1)[0])
         return -1
     [namesToIDs, adjacency, capacity, demand] = computeModelTXT(filename)
