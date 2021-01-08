@@ -1,11 +1,6 @@
 from .router import Router
 import numpy as np
-<<<<<<< HEAD
 from .functions import isSaturated
-=======
-from packages.functions import isSaturated
-
->>>>>>> 593bdcf3754dd5e9f1016f9590163618237ba5f4
 
 
 class Network:
@@ -67,10 +62,10 @@ class Network:
     check if network is saturated
     :return: [positions of saturated links] or -1
     """
-    saturated = np.where(self.loadMatrix >= 100)
-    if saturated[0].size > 0:
-        return list(zip(saturated[0],saturated[1]))
-    return -1
+        saturated = np.where(self.loadMatrix >= 100)
+        if saturated[0].size > 0:
+            return list(zip(saturated[0],saturated[1]))
+        return -1
 
 
 
