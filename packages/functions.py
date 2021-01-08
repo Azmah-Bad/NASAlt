@@ -45,7 +45,7 @@ def howManySP(router, dest):
                        0])  # discuss of the structure of router.shortest_path, especially when there are several paths
 
 
-def disturbNetwork(network, nb):
+def disturbNetwork(network):
     """
     Increase randomly links load on the network
     :param network: an object Network
@@ -54,15 +54,13 @@ def disturbNetwork(network, nb):
     """
     capacity_matrix = network.CapacityMatrix
 
-    for k in range(nb):
+    while( isSaturated(network.LoadMatrix) == -1) :
         i = randint(1, len(network.DemandMatrix) - 1)
         j = randint(1, len(network.DemandMatrix) - 1)
-        additional_load = randint(1, capacity_matrix[i][j] / 2) # maybe start at a lower value than 1 to have a real impact
-        network.DemandMatrix[i][j] += additional_load
-        network.DemandMatrix[j][i] += additional_load
-
-    network.nDijkstra()
-    computeLoadMatrix(network)
+        additional_load = randint( int(capacity_matrix[i][j] /3), int(3*capacity_matrix[i][j] / 4)) # maybe start at a lower value than 1 to have a real impact
+        network.DemandMatrix[i][j] += additional_load/network.CapacityMatrix[i][j]
+        network.DemandMatrix[j][i] += additional_load/network.CapacityMatrix[i][j]
+        network.nDijkstra()
 
 
 def computeLoadMatrix(network):
@@ -79,15 +77,9 @@ def computeLoadMatrix(network):
                     for dest,paths in links.items():
                         cost = demand_matrix[router.ID][dest]
                         for path in paths:
-                            network.LoadMatrix[i][j] += cost
+                            network.LoadMatrix[i][j] += cost/capacity_matrix[i][j] * 100
 
-    #Compute the proportions
-
-    """ problem if we have to add after
-    for i in range(len(network.LoadMatrix)):
-        for j in range(len(network.LoadMatrix)):
-            network.LoadMatrix[i][j] /= capacity_matrix[i][j]
-    """
+    network.LoadMatrix = np.around(network.LoadMatrix, decimals=1)
 
 def loadLink(link, loadMatrix):
     """
@@ -99,8 +91,8 @@ def loadLink(link, loadMatrix):
     return loadMatrix[link[0]][link[1]]
 
 
-def computeModelGML(filename):
-    """construct the adjecency matrix of a graph descripted in the format used by http://sndlib.zib.de/home.action in GML files
+def computeModel(filename):
+    """construct the adjecency matrix of a graph descripted in the format used by http://sndlib.zib.de/home.action
             input : filename = relative or absolute path to the description of the graph
             output : adjMat = adjacency marix of the graph
     """
@@ -110,7 +102,7 @@ def computeModelGML(filename):
             with open(filename) as f:
                 content = f.read()
         except IOError:
-            print("[computeModelGML] : erreur de lecture du fichier source\n")
+            print("[computeModel] : erreur de lecture du fichier source\n")
     else:
         return -1
 
@@ -126,65 +118,6 @@ def computeModelGML(filename):
         adjMat[src][dest] = 1
 
     return adjMat
-
-def computeModelTXT(filename, getDemand: bool = True, getCapacity: bool = True):
-    """construct the adjecency matrix of a graph descripted in the format used by http://sndlib.zib.de/home.action in native files
-        input : filename = relative or absolute path to the description of the graph
-                getDemand = boolean that indicates whether or not the function should return the demand descripted in the file
-                getCapacity = boolean that indicates whether or not the function should return the capaciy matrix described in file
-        output : adjMat = adjacency matrix of the graph
-                 demandMatrix = demand matrix of the file (if True) or np.zeros
-    """
-
-    if os.path.exists(filename):
-        try:
-            with open(filename) as f:
-                content  = f.read()
-        except IOError:
-            print("[computeModelTXT] : erreur de lecture du fichier source\n")
-    else:
-        print('Le fichier n\'existe pas')
-        return -1
-
-    nameToID = {}
-    i=0
-    [nodes, edges] = content.split("# LINK SECTION",1)
-    nodes = nodes.split('#')[-1].split("NODES (")[1].split('\n')
-    for oneNode in nodes:
-        name = oneNode.split('(',1)[0]
-        if len(name) > 0 and name != ')':
-            name = name.replace(' ','')
-            nameToID[name] = i
-            i+=1
-    adjMat = np.zeros(dtype=np.uint8, shape=(i, i))
-    capMat = np.zeros(dtype=np.uint64, shape=(i,i))
-    edges = edges.split("LINKS (")[1].split("# DEMAND SECTION")[0].split('\n')
-    for oneEdge in edges:
-        name = oneEdge.split('(')[0].replace(' ','')
-        if len(name) > 0 and name != ')':
-            cap = oneEdge.split(') ')[1].split(' ',1)[0].split('.')[0]
-            names = name.split('_')
-            adjMat[nameToID[names[0]]][nameToID[names[1]]] = 1
-            adjMat[nameToID[names[1]]][nameToID[names[0]]] = 1
-            capMat[nameToID[names[0]]][nameToID[names[1]]] = cap
-            capMat[nameToID[names[1]]][nameToID[names[0]]] = cap
-            
-
-    demandMatrix = np.zeros(dtype=np.uint64, shape=(i,i))
-    if getDemand:
-        demandDesc = content.split("DEMANDS (\n",1)[1].split('\n')
-        for oneDemand in demandDesc:
-            if len(oneDemand) < 5:
-                break
-            names = oneDemand.split('_')
-            names[0] = names[0].replace(' ','')
-            print(names)
-            dValue = names[1].split(') ')[1].split(' ')[1].split('.')[0]
-            names[1] = names[1].split(' ')[0]
-            print(names[1])
-            demandMatrix[nameToID[names[0]],nameToID[names[1]]]=int(dValue)
-
-    return adjMat, capMat, demandMatrix
 
 
 def isSaturated(lMatrix):
