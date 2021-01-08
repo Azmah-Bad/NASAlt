@@ -127,13 +127,14 @@ def computeModelGML(filename):
 
     return adjMat
 
-def computeModelTXT(filename, getDemand: bool = True, getCapacity: bool = True):
+def computeModelTXT(filename, nameToID = None, adjMat = None, capMat = None, demandMatrix = None):
     """construct the adjecency matrix of a graph descripted in the format used by http://sndlib.zib.de/home.action in native files
         input : filename = relative or absolute path to the description of the graph
-                getDemand = boolean that indicates whether or not the function should return the demand descripted in the file
-                getCapacity = boolean that indicates whether or not the function should return the capaciy matrix described in file
-        output : adjMat = adjacency matrix of the graph
-                 demandMatrix = demand matrix of the file (if True) or np.zeros
+                nameToID = if None, function computes it according to file (only for network description in source file because only demands can change from one not source file to another)
+                adjMat = if None, function computes it according to file (only for network description in source file because only demands can change from one not source file to another)
+                capMat = if None, function computes it according to file (only for network description in source file because only demands can change from one not source file to another)
+                demandMatrix = if None, function computes it according to file, not supposed to be None for now
+        output : inputs updated according to file
     """
 
     if os.path.exists(filename):
@@ -143,35 +144,42 @@ def computeModelTXT(filename, getDemand: bool = True, getCapacity: bool = True):
         except IOError:
             print("[computeModelTXT] : erreur de lecture du fichier source\n")
     else:
-        print('Le fichier n\'existe pas')
+        print('[computeModelTXT] : Le fichier source n\'existe pas')
         return -1
 
-    nameToID = {}
-    i=0
-    [nodes, edges] = content.split("# LINK SECTION",1)
-    nodes = nodes.split('#')[-1].split("NODES (")[1].split('\n')
-    for oneNode in nodes:
-        name = oneNode.split('(',1)[0]
-        if len(name) > 0 and name != ')':
-            name = name.replace(' ','')
-            nameToID[name] = i
-            i+=1
-    adjMat = np.zeros(dtype=np.uint8, shape=(i, i))
-    capMat = np.zeros(dtype=np.uint64, shape=(i,i))
-    edges = edges.split("LINKS (")[1].split("# DEMAND SECTION")[0].split('\n')
-    for oneEdge in edges:
-        name = oneEdge.split('(')[0].replace(' ','')
-        if len(name) > 0 and name != ')':
-            cap = oneEdge.split(') ')[1].split(' ',1)[0].split('.')[0]
-            names = name.split('_')
-            adjMat[nameToID[names[0]]][nameToID[names[1]]] = 1
-            adjMat[nameToID[names[1]]][nameToID[names[0]]] = 1
-            capMat[nameToID[names[0]]][nameToID[names[1]]] = cap
-            capMat[nameToID[names[1]]][nameToID[names[0]]] = cap
+    if nameToID == None :
+        nameToID = {}
+        i=0
+        [nodes, edges] = content.split("# LINK SECTION",1)
+        nodes = nodes.split('#')[-1].split("NODES (")[1].split('\n')
+        for oneNode in nodes:
+            name = oneNode.split('(',1)[0]
+            if len(name) > 0 and name != ')':
+                name = name.replace(' ','')
+                nameToID[name] = i
+                i+=1
+    if adjMat == None:
+        adjMat = np.zeros(dtype=np.uint8, shape=(i, i))
+
+    if capMat == None :
+        capMat = np.zeros(dtype=np.uint64, shape=(i,i))
+
+    if capMat == None and adjMat == None :
+        edges = edges.split("LINKS (")[1].split("# DEMAND SECTION")[0].split('\n')
+        for oneEdge in edges:
+            name = oneEdge.split('(')[0].replace(' ','')
+            if len(name) > 0 and name != ')':
+                cap = oneEdge.split(') ')[1].split(' ',1)[0].split('.')[0]
+                names = name.split('_')
+                adjMat[nameToID[names[0]]][nameToID[names[1]]] = 1
+                adjMat[nameToID[names[1]]][nameToID[names[0]]] = 1
+                capMat[nameToID[names[0]]][nameToID[names[1]]] = cap
+                capMat[nameToID[names[1]]][nameToID[names[0]]] = cap
+    
             
 
-    demandMatrix = np.zeros(dtype=np.uint64, shape=(i,i))
-    if getDemand:
+    if demandMatrix == None:
+        demandMatrix = np.zeros(dtype=np.uint64, shape=(i,i))
         demandDesc = content.split("DEMANDS (\n",1)[1].split('\n')
         for oneDemand in demandDesc:
             if len(oneDemand) < 5:
@@ -184,8 +192,39 @@ def computeModelTXT(filename, getDemand: bool = True, getCapacity: bool = True):
             print(names[1])
             demandMatrix[nameToID[names[0]],nameToID[names[1]]]=int(dValue)
 
-    return adjMat, capMat, demandMatrix
+    return nameToID, adjMat, capMat, demandMatrix
 
+def getDataset(filename):
+    """ compute a dataset from a file descripting a network and many mor files descripting different demand matrixes for this network
+            input : network description file (/!\ if filename = xxx then the directory containing demand descriptions has to be names demands-xxx)
+            output : [(adjacencyMatrix,demandMatrix,capacityMatrix)]
+    """
+    if not os.path.exists(filename):
+        print('[getDataSet] : Le fichier source n\'existe pas')
+        return -1
+    try :
+        demandFiles = os.listdir('demands-'+filename.split('.',1)[0])
+    except FileNotFoundError e:
+        print("[getDataset] : cannot list demand files with repo_name=",'demands-'+filename.split('.',1)[0])
+        return -1
+    [namesToIDs, adjacency, capacity, demand] = computeModelTXT(filename)
+    demands = []
+    for oneDFile in demandFiles:
+        [_,_,_,oneDemand] = computeModelTXT(oneDFile, namesToIDs, adjacency, capacity) #get only demand from file
+        if demand != None :
+            demands.append(oneDemand)
+        else:
+            print('[getDataset] : oneDemand is None')
+            return -1
+    ds = []
+    for oneD in demands:
+        ds.append((adjacency,oneD,capacity)
+        
+    ds = np.array(ds)
+
+    return ds
+    
+    
 
 def isSaturated(lMatrix):
     """
