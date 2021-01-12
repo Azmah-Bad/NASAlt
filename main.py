@@ -22,9 +22,16 @@ def printDifference(mat1,mat2):
         print(add)
     print("]")
 
-def main(network, max_iter):
+def main(network, max_iter, loop):
+    """
+    Compute new weights for the Adjacency matrix of a saturated network
+    :param network: Network object
+    :param max_iter: (int) the maximum number of times the model has to readjust the weights
+    :param loop: (boolean) readjust the weight in a loop or not
+    """
     iter = 0
     network.nDijkstra()
+    condition = isSaturated(network.LoadMatrix) != - 1 and iter < max_iter if loop else iter < max_iter
     load_before = np.around(network.LoadMatrix, decimals=1)
     adj_before = np.around(network.AdjacencyMatrix, decimals=1)
     print("\n\n----- Adjacency Matrix before -----\n", adj_before)
