@@ -115,3 +115,5 @@ class Router:
             minIncrements[dest] = alternativeSP[dest][1] - self.shortest_paths[dest][1]
 
         return minIncrements
+
+
