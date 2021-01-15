@@ -121,7 +121,7 @@ def computeModel(filename):
 
     return adjMat
 
-def computeModelTXT(filename, nameToID = None, adjMat = None, capMat = None, demandMatrix = None):
+def computeModelTXT(filename, nameToID = None, adjMat = np.array(None), capMat = np.array(None), demandMatrix = np.array(None)):
     """construct the adjecency matrix of a graph descripted in the format used by http://sndlib.zib.de/home.action in native files
         input : filename = relative or absolute path to the description of the graph
                 nameToID = if None, function computes it according to file (only for network description in source file because only demands can change from one not source file to another)
@@ -152,13 +152,13 @@ def computeModelTXT(filename, nameToID = None, adjMat = None, capMat = None, dem
                 name = name.replace(' ','')
                 nameToID[name] = i
                 i+=1
-    if adjMat == None:
+    if np.any(adjMat) == None:
         adjMat = np.zeros(dtype=np.uint8, shape=(i, i))
 
-    if capMat == None :
+    if np.any(capMat) == None :
         capMat = np.zeros(dtype=np.uint64, shape=(i,i))
 
-    if capMat == None and adjMat == None :
+    if np.any(capMat) == None and np.any(adjMat) == None :
         edges = edges.split("LINKS (")[1].split("# DEMAND SECTION")[0].split('\n')
         for oneEdge in edges:
             name = oneEdge.split('(')[0].replace(' ','')
@@ -172,7 +172,7 @@ def computeModelTXT(filename, nameToID = None, adjMat = None, capMat = None, dem
     
             
 
-    if demandMatrix == None:
+    if np.any(demandMatrix) == None:
         demandMatrix = np.zeros(dtype=np.uint64, shape=(i,i))
         demandDesc = content.split("DEMANDS (\n",1)[1].split('\n')
         for oneDemand in demandDesc:
