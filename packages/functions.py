@@ -7,7 +7,7 @@ import os
 import math
 
 
-def isThereLink(router, link):
+def isThereLink(router, link, sp=[]):
     """
     check if a link exists
     :param router: an object Router
@@ -15,17 +15,23 @@ def isThereLink(router, link):
     :return dictionary: keys = (int) router_id of the dest we want to reach using this link | value = array of paths
         (= array of int) which contain the link
     """
+    if sp == []:
+        shortest_paths = router.shortest_paths
+    else:
+        shortest_paths = sp
+
     res = {}
     if router.ID == link[0]:
         if link[1] in router.neighbors:
             return {link[1]: [[1]]}
-    for dest, paths in router.shortest_paths.items():
+    for dest, paths in sp.items():
         paths_to_add = []
         for path in paths[0]:
             if len(path) == 1 and router.ID == link[0] and link[1] in router.neighbors:
-                        paths_to_add.append([[ link[1] ]])
+                paths_to_add.append([[link[1]]])
             for j in range(len(path)):
-                if (j < len(path) - 1 and path[j] == link[0] and path[j + 1] == link[1]) or (j < len(path) - 1 and path[j+1] == link[0] and path[j] == link[1]):
+                if (j < len(path) - 1 and path[j] == link[0] and path[j + 1] == link[1]) or (
+                        j < len(path) - 1 and path[j + 1] == link[0] and path[j] == link[1]):
                     paths_to_add.append(path)
         if paths_to_add != []:
             res[dest] = paths_to_add
@@ -56,12 +62,13 @@ def disturbNetwork(network):
     """
     capacity_matrix = network.CapacityMatrix
 
-    while( isSaturated(network.LoadMatrix) == -1) :
+    while (isSaturated(network.LoadMatrix) == -1):
         i = randint(1, len(network.DemandMatrix) - 1)
         j = randint(1, len(network.DemandMatrix) - 1)
-        additional_load = randint( int(capacity_matrix[i][j] /3), int(3*capacity_matrix[i][j] / 4)) # maybe start at a lower value than 1 to have a real impact
-        network.DemandMatrix[i][j] += additional_load/network.CapacityMatrix[i][j]
-        network.DemandMatrix[j][i] += additional_load/network.CapacityMatrix[i][j]
+        additional_load = randint(int(capacity_matrix[i][j] / 3), int(
+            3 * capacity_matrix[i][j] / 4))  # maybe start at a lower value than 1 to have a real impact
+        network.DemandMatrix[i][j] += additional_load / network.CapacityMatrix[i][j]
+        network.DemandMatrix[j][i] += additional_load / network.CapacityMatrix[i][j]
         network.nDijkstra()
 
 
@@ -74,14 +81,15 @@ def computeLoadMatrix(network):
     for router in network.Routers:
         for i in range(len(network.LoadMatrix)):
             for j in range(len(network.LoadMatrix)):
-                links = isThereLink( router, (i, j) )
+                links = isThereLink(router, (i, j))
                 if links != {}:
-                    for dest,paths in links.items():
+                    for dest, paths in links.items():
                         cost = demand_matrix[router.ID][dest]
                         for path in paths:
-                            network.LoadMatrix[i][j] += cost/capacity_matrix[i][j] * 100
+                            network.LoadMatrix[i][j] += cost / capacity_matrix[i][j] * 100
 
     network.LoadMatrix = np.around(network.LoadMatrix, decimals=1)
+
 
 def loadLink(link, loadMatrix):
     """
@@ -134,22 +142,22 @@ def computeModelTXT(filename, nameToID = None, adjMat = np.array(None), capMat =
     if os.path.exists(filename):
         try:
             with open(filename) as f:
-                content  = f.read()
+                content = f.read()
         except IOError:
             print("[computeModelTXT] : erreur de lecture du fichier source\n")
     else:
         print('[computeModelTXT] : Le fichier source n\'existe pas')
         return -1
 
-    if nameToID == None :
+    if nameToID == None:
         nameToID = {}
-        i=0
-        [nodes, edges] = content.split("# LINK SECTION",1)
+        i = 0
+        [nodes, edges] = content.split("# LINK SECTION", 1)
         nodes = nodes.split('#')[-1].split("NODES (")[1].split('\n')
         for oneNode in nodes:
-            name = oneNode.split('(',1)[0]
+            name = oneNode.split('(', 1)[0]
             if len(name) > 0 and name != ')':
-                name = name.replace(' ','')
+                name = name.replace(' ', '')
                 nameToID[name] = i
                 i+=1
     if np.any(adjMat) == None:
@@ -161,16 +169,14 @@ def computeModelTXT(filename, nameToID = None, adjMat = np.array(None), capMat =
     if np.any(capMat) == None and np.any(adjMat) == None :
         edges = edges.split("LINKS (")[1].split("# DEMAND SECTION")[0].split('\n')
         for oneEdge in edges:
-            name = oneEdge.split('(')[0].replace(' ','')
+            name = oneEdge.split('(')[0].replace(' ', '')
             if len(name) > 0 and name != ')':
-                cap = oneEdge.split(') ')[1].split(' ',1)[0].split('.')[0]
+                cap = oneEdge.split(') ')[1].split(' ', 1)[0].split('.')[0]
                 names = name.split('_')
                 adjMat[nameToID[names[0]]][nameToID[names[1]]] = 1
                 adjMat[nameToID[names[1]]][nameToID[names[0]]] = 1
                 capMat[nameToID[names[0]]][nameToID[names[1]]] = cap
                 capMat[nameToID[names[1]]][nameToID[names[0]]] = cap
-    
-            
 
     if np.any(demandMatrix) == None:
         demandMatrix = np.zeros(dtype=np.uint64, shape=(i,i))
@@ -179,14 +185,15 @@ def computeModelTXT(filename, nameToID = None, adjMat = np.array(None), capMat =
             if len(oneDemand) < 5:
                 break
             names = oneDemand.split('_')
-            names[0] = names[0].replace(' ','')
+            names[0] = names[0].replace(' ', '')
             print(names)
             dValue = names[1].split(') ')[1].split(' ')[1].split('.')[0]
             names[1] = names[1].split(' ')[0]
             print(names[1])
-            demandMatrix[nameToID[names[0]],nameToID[names[1]]]=int(dValue)
+            demandMatrix[nameToID[names[0]], nameToID[names[1]]] = int(dValue)
 
     return nameToID, adjMat, capMat, demandMatrix
+
 
 def getDataset(filename):
     """ compute a dataset from a file descripting a network and many mor files descripting different demand matrixes for this network
@@ -196,16 +203,16 @@ def getDataset(filename):
     if not os.path.exists(filename):
         print('[getDataSet] : Le fichier source n\'existe pas')
         return -1
-    try :
-        demandFiles = os.listdir('demands-'+filename.split('.',1)[0])
+    try:
+        demandFiles = os.listdir('demands-' + filename.split('.', 1)[0])
     except FileNotFoundError:
-        print("[getDataset] : cannot list demand files with repo_name=",'demands-'+filename.split('.',1)[0])
+        print("[getDataset] : cannot list demand files with repo_name=", 'demands-' + filename.split('.', 1)[0])
         return -1
     [namesToIDs, adjacency, capacity, demand] = computeModelTXT(filename)
     demands = []
     for oneDFile in demandFiles:
-        [_,_,_,oneDemand] = computeModelTXT(oneDFile, namesToIDs, adjacency, capacity) #get only demand from file
-        if demand != None :
+        [_, _, _, oneDemand] = computeModelTXT(oneDFile, namesToIDs, adjacency, capacity)  # get only demand from file
+        if demand != None:
             demands.append(oneDemand)
         else:
             print('[getDataset] : oneDemand is None')
@@ -217,12 +224,8 @@ def getDataset(filename):
         totalDemand = np.sum(oneD)
         oneD = oneD*(totalCapacity/totalDemand)
         ds.append((adjacency,oneD,capacity))
-    
-    ds = np.array(ds)
-
     return ds
-    
-    
+
 
 def isSaturated(lMatrix):
     """
@@ -231,8 +234,9 @@ def isSaturated(lMatrix):
     """
     saturated = np.where(lMatrix >= 100)
     if saturated[0].size > 0:
-        return list(zip(saturated[0],saturated[1]))
+        return list(zip(saturated[0], saturated[1]))
     return -1
+
 
 def getMaxLoad(lMatrix):
     """
@@ -242,7 +246,7 @@ def getMaxLoad(lMatrix):
     value = np.amax(lMatrix)
     indexes = np.where(lMatrix == value)
     indexes = list(zip(indexes[0], indexes[1]))
-    return {value : indexes}
+    return {value: indexes}
 
 
 def networkFromList(a_list):
@@ -251,31 +255,33 @@ def networkFromList(a_list):
     :return: Network
     """
 
-    #get the different matrix in a 1D vector
-    adjacency_matrix = np.array(a_list[0:int(len(a_list)/3)])
-    demand_matrix = np.array(a_list[int(len(a_list)/3):int(2*len(a_list)/3)])
+    # get the different matrix in a 1D vector
+    adjacency_matrix = np.array(a_list[0:int(len(a_list) / 3)])
+    demand_matrix = np.array(a_list[int(len(a_list) / 3):int(2 * len(a_list) / 3)])
 
-    #reshape
-    adjacency_matrix = adjacency_matrix.reshape(int(math.sqrt(len(adjacency_matrix))),int(math.sqrt(len(adjacency_matrix))))
-    demand_matrix = demand_matrix.reshape(int(math.sqrt(len(demand_matrix))),int(math.sqrt(len(demand_matrix))))
+    # reshape
+    adjacency_matrix = adjacency_matrix.reshape(int(math.sqrt(len(adjacency_matrix))),
+                                                int(math.sqrt(len(adjacency_matrix))))
+    demand_matrix = demand_matrix.reshape(int(math.sqrt(len(demand_matrix))), int(math.sqrt(len(demand_matrix))))
 
-    network = Network(adjacency_matrix,demand_matrix)
+    network = Network(adjacency_matrix, demand_matrix)
 
 
-def printDifference(mat1,mat2):
+def printDifference(mat1, mat2):
     """
     print a matrix in a different way where a value has been changed, help for debug
     """
     print("[")
-    for i in range (len(mat1)):
+    for i in range(len(mat1)):
         add = []
-        for j in range (len(mat1)):
+        for j in range(len(mat1)):
             if mat1[i][j] != mat2[i][j]:
-                add.append( "+" + str(mat2[i][j]) ) if mat1[i][j] < mat2[i][j] else add.append( "_" + str(mat2[i][j]) )
+                add.append("+" + str(mat2[i][j])) if mat1[i][j] < mat2[i][j] else add.append("_" + str(mat2[i][j]))
             else:
                 add.append(str(mat2[i][j]))
         print(add)
     print("]")
+
 
 def train(network, max_iter, loop):
     """
@@ -289,29 +295,54 @@ def train(network, max_iter, loop):
     condition = isSaturated(network.LoadMatrix) != - 1 and iter < max_iter if loop else iter < max_iter
     load_before = np.around(network.LoadMatrix, decimals=1)
     adj_before = np.around(network.AdjacencyMatrix, decimals=1)
-    #print("\n\n----- Adjacency Matrix before -----\n", adj_before)
-    #print("\n\n----- Load Matrix before -----\n", load_before)
+    # print("\n\n----- Adjacency Matrix before -----\n", adj_before)
+    # print("\n\n----- Load Matrix before -----\n", load_before)
 
     if isSaturated(network.LoadMatrix) == -1:
         disturbNetwork(network)
-        print("\n\n----- Load Matrix after disturb -----\n",network.LoadMatrix)
+        print("\n\n----- Load Matrix after disturb -----\n", network.LoadMatrix)
 
     print("\n#Start\n")
     while isSaturated(network.LoadMatrix) != - 1 and iter < max_iter:
-        maxLink = getMaxLoad(network.LoadMatrix)
+        saturated_link = getMaxLoad()
+        routersLoad = {}  # ex : {1: {dest1: [sp], dest2: [sp] ..} 2: …}
 
-        for _,links in maxLink.items() :
-            for link in links :
-                network.AdjacencyMatrix[link[0]][link[1]] += 1/network.CapacityMatrix[link[0]][link[1]] #minIncr
-        network.nDijkstra()
-        iter += 1
-    network.AdjacencyMatrix = np.around(network.AdjacencyMatrix, decimals=1)
+        for router in Network.Routers:
+            alternative_sp = router.restrainedDijskstra(saturated_link)
+        where = isThereLink(router, router.saturated_link, alternative_sp)
+        if where != {}:
+            routersLoad[router.ID] = router.minIncr(alternative_sp)
 
+        rand_router = randint(0, len(routersLoad))
+        rand_dest = randint(0, len(routersLoad[rand_router]))
+        minIncr = routersLoad[rand_router][rand_dest]
+        Network.AdjacencyMatrix[saturated_link[0]][saturated_link[1]] += minIncr
+        minIncr /= len(Network.Routers[router].shortest_paths[rand_dest])
+
+        # increment other links in the path
+
+    #prints
     color_red = '\033[31m'
     color_green = '\033[32m'
-    print(color_red + "\n\n----- Adjacency Matrix after -----") if isSaturated(network.LoadMatrix) != -1 else print(color_green + "\n\n----- Adjacency Matrix after -----")
+    print(color_red + "\n\n----- Adjacency Matrix after -----") if isSaturated(network.LoadMatrix) != -1 else print(
+        color_green + "\n\n----- Adjacency Matrix after -----")
     print('\033[0m')
-    printDifference(adj_before,network.AdjacencyMatrix)
-    print(color_red + "\n\n----- Load Matrix after -----") if isSaturated(network.LoadMatrix) != -1 else print(color_green + "\n\n----- Load Matrix after -----")
+    printDifference(adj_before, network.AdjacencyMatrix)
+    print(color_red + "\n\n----- Load Matrix after -----") if isSaturated(network.LoadMatrix) != -1 else print(
+        color_green + "\n\n----- Load Matrix after -----")
     print('\033[0m')
-    printDifference(load_before,network.LoadMatrix)
+    printDifference(load_before, network.LoadMatrix)
+
+
+def fromSPGetLinks(sp):
+    """
+    Compute the links associated to a shortest path
+    :param sp: array of router ID -> shortest path
+    :return: array of tuple corresponding to the links
+    """
+    links = []
+    for i in range(sp):
+        if i != len(sp) - 1:
+            links.append((sp[i], sp[i + 1]))
+
+    return links
