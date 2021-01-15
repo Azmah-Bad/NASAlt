@@ -260,3 +260,58 @@ def networkFromList(a_list):
     demand_matrix = demand_matrix.reshape(int(math.sqrt(len(demand_matrix))),int(math.sqrt(len(demand_matrix))))
 
     network = Network(adjacency_matrix,demand_matrix)
+
+
+def printDifference(mat1,mat2):
+    """
+    print a matrix in a different way where a value has been changed, help for debug
+    """
+    print("[")
+    for i in range (len(mat1)):
+        add = []
+        for j in range (len(mat1)):
+            if mat1[i][j] != mat2[i][j]:
+                add.append( "+" + str(mat2[i][j]) ) if mat1[i][j] < mat2[i][j] else add.append( "_" + str(mat2[i][j]) )
+            else:
+                add.append(str(mat2[i][j]))
+        print(add)
+    print("]")
+
+def train(network, max_iter, loop):
+    """
+    Compute new weights for the Adjacency matrix of a saturated network
+    :param network: Network object
+    :param max_iter: (int) the maximum number of times the model has to readjust the weights
+    :param loop: (boolean) readjust the weight in a loop or not
+    """
+    iter = 0
+    network.nDijkstra()
+    condition = isSaturated(network.LoadMatrix) != - 1 and iter < max_iter if loop else iter < max_iter
+    load_before = np.around(network.LoadMatrix, decimals=1)
+    adj_before = np.around(network.AdjacencyMatrix, decimals=1)
+    #print("\n\n----- Adjacency Matrix before -----\n", adj_before)
+    #print("\n\n----- Load Matrix before -----\n", load_before)
+
+    if isSaturated(network.LoadMatrix) == -1:
+        disturbNetwork(network)
+        print("\n\n----- Load Matrix after disturb -----\n",network.LoadMatrix)
+
+    print("\n#Start\n")
+    while isSaturated(network.LoadMatrix) != - 1 and iter < max_iter:
+        maxLink = getMaxLoad(network.LoadMatrix)
+
+        for _,links in maxLink.items() :
+            for link in links :
+                network.AdjacencyMatrix[link[0]][link[1]] += 1/network.CapacityMatrix[link[0]][link[1]] #minIncr
+        network.nDijkstra()
+        iter += 1
+    network.AdjacencyMatrix = np.around(network.AdjacencyMatrix, decimals=1)
+
+    color_red = '\033[31m'
+    color_green = '\033[32m'
+    print(color_red + "\n\n----- Adjacency Matrix after -----") if isSaturated(network.LoadMatrix) != -1 else print(color_green + "\n\n----- Adjacency Matrix after -----")
+    print('\033[0m')
+    printDifference(adj_before,network.AdjacencyMatrix)
+    print(color_red + "\n\n----- Load Matrix after -----") if isSaturated(network.LoadMatrix) != -1 else print(color_green + "\n\n----- Load Matrix after -----")
+    print('\033[0m')
+    printDifference(load_before,network.LoadMatrix)
