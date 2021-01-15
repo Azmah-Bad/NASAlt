@@ -217,7 +217,7 @@ def getDataset(filename):
     totalCapacity = np.sum(capacity)
     for oneD in demands:
         totalDemand = np.sum(oneD)
-        if totalDemand >= 0:
+        if totalDemand > 0:
             oneD = oneD*(totalCapacity/totalDemand)
             ds.append((adjacency,oneD,capacity))
     return ds
