@@ -1,6 +1,6 @@
 from .router import Router
 import numpy as np
-from .functions import isSaturated
+from .functions import computeLoadMatrix
 
 
 class Network:
@@ -54,14 +54,11 @@ class Network:
             print("#", router.ID, "\n", router.shortest_paths, "\n")
         return 1
 
-    def isCongested(self) -> bool:
-        return isSaturated(self.DemandMatrix)
-
     def isSaturated(self):
-    """
-    check if network is saturated
-    :return: [positions of saturated links] or -1
-    """
+        """
+        check if network is saturated
+        :return: [positions of saturated links] or -1
+        """
         saturated = np.where(self.loadMatrix >= 100)
         if saturated[0].size > 0:
             return list(zip(saturated[0],saturated[1]))
