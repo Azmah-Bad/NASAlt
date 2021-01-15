@@ -211,9 +211,13 @@ def getDataset(filename):
             print('[getDataset] : oneDemand is None')
             return -1
     ds = []
+    #adjust demand matrix given capacity
+    totalCapacity = np.sum(capacity)
     for oneD in demands:
+        totalDemand = np.sum(oneD)
+        oneD = oneD*(totalCapacity/totalDemand)
         ds.append((adjacency,oneD,capacity))
-        
+    
     ds = np.array(ds)
 
     return ds
