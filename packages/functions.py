@@ -163,7 +163,7 @@ def computeModelTXT(filename, nameToID = None, adjMat = np.array(None), capMat =
                 i+=1
 
     if np.any(capMat) == None and np.any(adjMat) == None :
-        adjMat = np.zeros(dtype=np.uint8, shape=(i, i))
+        adjMat = math.inf*np.ones(dtype=np.uint8, shape=(i, i))
         capMat = np.zeros(dtype=np.uint64, shape=(i,i))
         edges = edges.split("LINKS (")[1].split("# DEMAND SECTION")[0].split('\n')
         for oneEdge in edges:
