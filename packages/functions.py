@@ -304,6 +304,8 @@ def train(network, max_iter, loop):
 
     print("\n#Start\n")
     while isSaturated(network.LoadMatrix) != - 1 and iter < max_iter:
+
+        """Find the saturated link and the minimum increment """
         saturated_link = getMaxLoad()
         routersLoad = {}  # ex : {1: {dest1: [sp], dest2: [sp] ..} 2: …}
 
@@ -316,12 +318,49 @@ def train(network, max_iter, loop):
         rand_router = randint(0, len(routersLoad))
         rand_dest = randint(0, len(routersLoad[rand_router]))
         minIncr = routersLoad[rand_router][rand_dest]
-        Network.AdjacencyMatrix[saturated_link[0]][saturated_link[1]] += minIncr
-        minIncr /= len(Network.Routers[router].shortest_paths[rand_dest])
 
-        # increment other links in the path
+        """
+        70% > increment only the saturated link
+        30% > increment the nearby links
+        """
+        incrOneLink = randint(1, 10) <= 7
+        if incrOneLink:
+            network.AdjacencyMatrix[saturated_link[0]][saturated_link[1]] += minIncr
 
-    #prints
+        # increment the nearby links
+        else:
+            situation = randint(1,100);
+            nearbyLink = nearbyLinks(network.AdjacencyMatrix,saturated_link)
+            # Increment all the nearby links with an equal cost
+            if situation <= 33 :
+                i = 0
+                while minIncr > 0 and i < len(nearbyLink) - 1 :
+                    network.AdjacencyMatrix[(nearbyLink[i])[0]][(nearbyLink[i])[1]] += 1
+                    i += 1
+                    minIncr -= 1
+
+            # Increment the saturated link with 50% of minIncr and all the nearby links with an equal cost
+            elif situation <= 66:
+                bigIncr = minIncr // 2
+                minIncr -= bigIncr
+                network.AdjacencyMatrix[saturated_link[0]][saturated_link[1]] += bigIncr
+                i = 0
+
+                while minIncr > 0 and i < len(nearbyLink) - 1 :
+                    network.AdjacencyMatrix[(nearbyLink[i])[0]][(nearbyLink[i])[1]] += 1
+                    i += 1
+                    minIncr -= 1
+
+            # Increment progressively the saturated link and the nearby links
+            else:
+                i = 0
+                progressive_incr = [30, 20, 10]
+                network.AdjacencyMatrix[saturated_link[0]][saturated_link[1]] += round(0.4*minIncr)
+                while i < min(len(nearbyLink) - 1, len(progressive_incr)):
+                    network.AdjacencyMatrix[(nearbyLink[i])[0]][(nearbyLink[i])[1]] += round(minIncr*progressive_incr[i])
+                    i += 1
+
+    # prints
     color_red = '\033[31m'
     color_green = '\033[32m'
     print(color_red + "\n\n----- Adjacency Matrix after -----") if isSaturated(network.LoadMatrix) != -1 else print(
@@ -346,4 +385,13 @@ def fromSPGetLinks(sp):
             links.append((sp[i], sp[i + 1]))
 
     return links
+
+
+def nearbyLinks(adjacency_matrix, link):
+    res = []
+    for idx, w in enumerate(adjacency_matrix[link[1]]):
+        if w > 0:
+            res.append((link[1], idx))
+
+    return res
 
