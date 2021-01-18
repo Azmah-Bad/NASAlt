@@ -130,7 +130,7 @@ def computeModel(filename):
     return adjMat
 
 
-def computeModelTXT(filename, nameToID=None, adjMat=None, capMat=None, demandMatrix=None):
+def computeModelTXT(filename, nameToID = None, adjMat = np.array(None), capMat = np.array(None), demandMatrix = np.array(None)):
     """construct the adjecency matrix of a graph descripted in the format used by http://sndlib.zib.de/home.action in native files
         input : filename = relative or absolute path to the description of the graph
                 nameToID = if None, function computes it according to file (only for network description in source file because only demands can change from one not source file to another)
@@ -160,41 +160,35 @@ def computeModelTXT(filename, nameToID=None, adjMat=None, capMat=None, demandMat
             if len(name) > 0 and name != ')':
                 name = name.replace(' ', '')
                 nameToID[name] = i
-                i += 1
-    if adjMat == None:
+                i+=1
+
+    if np.any(capMat) == None and np.any(adjMat) == None :
         adjMat = np.zeros(dtype=np.uint8, shape=(i, i))
-
-    if capMat == None:
-        capMat = np.zeros(dtype=np.uint64, shape=(i, i))
-
-    if capMat == None and adjMat == None:
+        capMat = np.zeros(dtype=np.uint64, shape=(i,i))
         edges = edges.split("LINKS (")[1].split("# DEMAND SECTION")[0].split('\n')
         for oneEdge in edges:
             name = oneEdge.split('(')[0].replace(' ', '')
             if len(name) > 0 and name != ')':
-                cap = oneEdge.split(') ')[1].split(' ', 1)[0].split('.')[0]
+                cap = np.int(oneEdge.split(')',1)[1].split('(',1)[1].split('.',1)[0].replace(' ',''))
                 names = name.split('_')
                 adjMat[nameToID[names[0]]][nameToID[names[1]]] = 1
                 adjMat[nameToID[names[1]]][nameToID[names[0]]] = 1
                 capMat[nameToID[names[0]]][nameToID[names[1]]] = cap
                 capMat[nameToID[names[1]]][nameToID[names[0]]] = cap
 
-    if demandMatrix == None:
-        demandMatrix = np.zeros(dtype=np.uint64, shape=(i, i))
-        demandDesc = content.split("DEMANDS (\n", 1)[1].split('\n')
+    if np.any(demandMatrix) == None:
+        demandMatrix = np.zeros(dtype=np.uint64, shape=adjMat.shape)
+        demandDesc = content.split("DEMANDS (\n",1)[1].split('\n')
         for oneDemand in demandDesc:
             if len(oneDemand) < 5:
                 break
             names = oneDemand.split('_')
             names[0] = names[0].replace(' ', '')
-            print(names)
-            dValue = names[1].split(') ')[1].split(' ')[1].split('.')[0]
+            dValue = np.int(names[1].split(') ')[1].split(' ')[1].split('.')[0])
             names[1] = names[1].split(' ')[0]
-            print(names[1])
             demandMatrix[nameToID[names[0]], nameToID[names[1]]] = int(dValue)
 
     return nameToID, adjMat, capMat, demandMatrix
-
 
 def getDataset(filename):
     """ compute a dataset from a file descripting a network and many mor files descripting different demand matrixes for this network
@@ -205,26 +199,40 @@ def getDataset(filename):
         print('[getDataSet] : Le fichier source n\'existe pas')
         return -1
     try:
-        demandFiles = os.listdir('demands-' + filename.split('.', 1)[0])
+        demandRepo = "{}/demands-{}".format("".join(filename.split('/')[:-1]), filename.split('/')[-1].split('.',1)[0]) if '/' in filename else "demands-{}".format(filename)
+        demandFiles = os.listdir(demandRepo)
     except FileNotFoundError:
-        print("[getDataset] : cannot list demand files with repo_name=", 'demands-' + filename.split('.', 1)[0])
+        print("[getDataset] : cannot list demand files with repo_name=", "{}/demands-{}".format("".join(filename.split('/')[:-1]), filename.split('/')[-1].split('.',1)[0]))
         return -1
     [namesToIDs, adjacency, capacity, demand] = computeModelTXT(filename)
     demands = []
     for oneDFile in demandFiles:
-        [_, _, _, oneDemand] = computeModelTXT(oneDFile, namesToIDs, adjacency, capacity)  # get only demand from file
-        if demand != None:
+        [_, _, _, oneDemand] = computeModelTXT("{}/{}".format(demandRepo,oneDFile), namesToIDs, adjacency, capacity)  # get only demand from file
+        if not (oneDemand.any() == None):
             demands.append(oneDemand)
         else:
             print('[getDataset] : oneDemand is None')
             return -1
     ds = []
+<<<<<<< HEAD
     # adjust demand matrix given capacity
     totalCapacity = np.sum(capacity)
     for oneD in demands:
         totalDemand = np.sum(oneD)
         oneD = oneD * (totalCapacity / totalDemand)
         ds.append((adjacency, oneD, capacity))
+=======
+    #adjust demand matrix given capacity
+    for oneD in demands:
+        tempNetwork = Network(adjacency,oneD,capacity)
+        computeLoadMatrix(tempNetwork)
+        maxLoadWithLinks = getMaxLoad(tempNetwork.LoadMatrix)
+        maxLoad = list(maxLoadWithLinks)[0]
+        toSaturation = 100/maxLoad
+        if toSaturation > 0:
+            oneD = oneD*toSaturation
+            ds.append((adjacency,oneD,capacity))
+>>>>>>> e8a82c4db2a1615729bee314fbdf15de71eeffda
     return ds
 
 
@@ -395,3 +403,4 @@ def nearbyLinks(adjacency_matrix, link):
             res.append((link[1], idx))
 
     return res
+

@@ -16,7 +16,6 @@ class Network:
             self.CapacityMatrix = 10*np.ones(shape=np.shape(AdjacencyMatrix))
         else :
             self.CapacityMatrix = capacityMatrix
-        self.LoadMatrix = np.zeros(shape=np.shape(AdjacencyMatrix))
         self.nDijkstra()
         computeLoadMatrix(self)
 
