@@ -199,14 +199,15 @@ def getDataset(filename):
         print('[getDataSet] : Le fichier source n\'existe pas')
         return -1
     try:
-        demandFiles = os.listdir('demands-' + filename.split('.', 1)[0])
+        demandRepo = "{}/demands-{}".format("".join(filename.split('/')[:-1]), filename.split('/')[-1].split('.',1)[0]) if '/' in filename else "demands-{}".format(filename)
+        demandFiles = os.listdir(demandRepo)
     except FileNotFoundError:
-        print("[getDataset] : cannot list demand files with repo_name=", 'demands-' + filename.split('.', 1)[0])
+        print("[getDataset] : cannot list demand files with repo_name=", "{}/demands-{}".format("".join(filename.split('/')[:-1]), filename.split('/')[-1].split('.',1)[0]))
         return -1
     [namesToIDs, adjacency, capacity, demand] = computeModelTXT(filename)
     demands = []
     for oneDFile in demandFiles:
-        [_, _, _, oneDemand] = computeModelTXT("./demands-{}/{}".format(filename.split('.',1)[0],oneDFile), namesToIDs, adjacency, capacity)  # get only demand from file
+        [_, _, _, oneDemand] = computeModelTXT("{}/{}".format(demandRepo,oneDFile), namesToIDs, adjacency, capacity)  # get only demand from file
         if not (oneDemand.any() == None):
             demands.append(oneDemand)
         else:
@@ -214,11 +215,14 @@ def getDataset(filename):
             return -1
     ds = []
     #adjust demand matrix given capacity
-    totalCapacity = np.sum(capacity)
     for oneD in demands:
-        totalDemand = np.sum(oneD)
-        if totalDemand > 0:
-            oneD = oneD*(totalCapacity/totalDemand)
+        tempNetwork = Network(adjacency,oneD,capacity)
+        computeLoadMatrix(tempNetwork)
+        maxLoadWithLinks = getMaxLoad(tempNetwork.LoadMatrix)
+        maxLoad = list(maxLoadWithLinks)[0]
+        toSaturation = 100/maxLoad
+        if toSaturation > 0:
+            oneD = oneD*toSaturation
             ds.append((adjacency,oneD,capacity))
     return ds
 
@@ -342,3 +346,4 @@ def fromSPGetLinks(sp):
             links.append((sp[i], sp[i + 1]))
 
     return links
+
