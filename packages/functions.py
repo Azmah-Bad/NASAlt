@@ -214,14 +214,6 @@ def getDataset(filename):
             print('[getDataset] : oneDemand is None')
             return -1
     ds = []
-<<<<<<< HEAD
-    # adjust demand matrix given capacity
-    totalCapacity = np.sum(capacity)
-    for oneD in demands:
-        totalDemand = np.sum(oneD)
-        oneD = oneD * (totalCapacity / totalDemand)
-        ds.append((adjacency, oneD, capacity))
-=======
     #adjust demand matrix given capacity
     for oneD in demands:
         tempNetwork = Network(adjacency,oneD,capacity)
@@ -232,7 +224,6 @@ def getDataset(filename):
         if toSaturation > 0:
             oneD = oneD*toSaturation
             ds.append((adjacency,oneD,capacity))
->>>>>>> e8a82c4db2a1615729bee314fbdf15de71eeffda
     return ds
 
 
