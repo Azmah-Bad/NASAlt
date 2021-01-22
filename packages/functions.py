@@ -121,7 +121,7 @@ def computeModel(filename):
     nodeNumber = int(lastNodeDescription.split("id")[1].split('\n')[0].replace(' ', '')) + 1
 
     edges = edges.split("edge")
-    adjMat = np.zeros(dtype=np.uint8, shape=(nodeNumber, nodeNumber))
+    adjMat = math.inf*np.ones(dtype=np.uint8, shape=(nodeNumber, nodeNumber))
     for _, oneEdge in enumerate(edges):
         src = int(oneEdge.split("source")[1].split('\n')[0].replace(' ', ''))
         dest = int(oneEdge.split("target")[1].split('\n')[0].replace(' ', ''))
@@ -215,8 +215,9 @@ def getDataset(filename):
             return -1
     ds = []
     #adjust demand matrix given capacity
+    tempNetwork = Network(adjacency,oneD,capacity)
     for oneD in demands:
-        tempNetwork = Network(adjacency,oneD,capacity)
+        tempNetwork.DemandMatrix = oneD
         computeLoadMatrix(tempNetwork)
         maxLoadWithLinks = getMaxLoad(tempNetwork.LoadMatrix)
         maxLoad = list(maxLoadWithLinks)[0]
