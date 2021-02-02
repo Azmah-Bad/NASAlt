@@ -7,7 +7,7 @@ import os
 import math
 
 
-def isThereLink(router, link, sp=[]):
+def isThereLink(router, link, sp={}):
     """
     check if a link exists
     :param router: an object Router
@@ -15,7 +15,7 @@ def isThereLink(router, link, sp=[]):
     :return dictionary: keys = (int) router_id of the dest we want to reach using this link | value = array of paths
         (= array of int) which contain the link
     """
-    if sp == []:
+    if sp == {}:
         shortest_paths = router.shortest_paths
     else:
         shortest_paths = sp
@@ -24,7 +24,7 @@ def isThereLink(router, link, sp=[]):
     if router.ID == link[0]:
         if link[1] in router.neighbors:
             return {link[1]: [[1]]}
-    for dest, paths in sp.items():
+    for dest, paths in shortest_paths.items():
         paths_to_add = []
         for path in paths[0]:
             if len(path) == 1 and router.ID == link[0] and link[1] in router.neighbors:
