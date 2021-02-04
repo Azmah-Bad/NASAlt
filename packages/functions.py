@@ -395,4 +395,3 @@ def nearbyLinks(adjacency_matrix, link):
             res.append((link[1], idx))
 
     return res
-

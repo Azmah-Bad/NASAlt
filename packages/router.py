@@ -33,9 +33,11 @@ class Router:
         :return:
         """
         # init shortest paths
+        print("Adj in dij ", self.adjacency_matrix)
         NextHops = []
         for Destination in range(len(self.adjacency_matrix)):
-            if self.adjacency_matrix[self.ID][Destination] == math.inf:
+            if self.adjacency_matrix[self.ID][Destination] == math.inf or self.adjacency_matrix[self.ID][
+                Destination] == 40000:
                 self.shortest_paths[Destination] = ([[]], math.inf)
             else:
                 self.shortest_paths[Destination] = ([[Destination]], self.adjacency_matrix[self.ID][Destination])
@@ -53,7 +55,8 @@ class Router:
                             Cost + CostToHop)
                         NextHops.append(Destination)
                     elif Cost + CostToHop == self.shortest_paths[Destination][1] and not \
-                            self.shortest_paths[Destination][1] == math.inf:  # same costly route
+                            (self.shortest_paths[Destination][1] == math.inf or self.shortest_paths[Destination][
+                                1] == 40000):  # same costly route
                         for OldRoute in self.shortest_paths[NextHop][0]:
                             NewRoute = OldRoute + [Destination]
                             if NewRoute not in self.shortest_paths[Destination][0]:
@@ -78,7 +81,7 @@ class Router:
         # init shortest paths
         NextHops = []
         for Destination in range(len(adj_mat)):
-            if adj_mat[self.ID][Destination] == math.inf:
+            if adj_mat[self.ID][Destination] == math.inf or adj_mat[self.ID][Destination] == 40000:
                 sp[Destination] = ([[]], math.inf)
             else:
                 sp[Destination] = ([[Destination]], adj_mat[self.ID][Destination])
@@ -95,7 +98,7 @@ class Router:
                             [PathToHop + [Destination] for PathToHop in sp[NextHop][0]], Cost + CostToHop)
                         NextHops.append(Destination)
                     elif Cost + CostToHop == sp[Destination][1] and not \
-                            sp[Destination][1] == math.inf:  # same costly route
+                            (sp[Destination][1] == math.inf or sp[Destination][1] == 40000):  # same costly route
                         for OldRoute in sp[NextHop][0]:
                             NewRoute = OldRoute + [Destination]
                             if NewRoute not in sp[Destination][0]:

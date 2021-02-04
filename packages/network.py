@@ -5,14 +5,14 @@ from .functions import computeLoadMatrix
 
 class Network:
 
-    def __init__(self, AdjacencyMatrix, DemandMatrix, capacityMatrix=None):
+    def __init__(self, AdjacencyMatrix, DemandMatrix, capacityMatrix=np.array([None])):
         self.AdjacencyMatrix = AdjacencyMatrix
         self.Routers = []
         self.DemandMatrix = DemandMatrix
 
         for ID in range(len(AdjacencyMatrix)):
             self.Routers.append(Router(ID, AdjacencyMatrix, DemandMatrix))
-        if capacityMatrix == None:
+        if capacityMatrix.all() is None:
             self.CapacityMatrix = 10*np.ones(shape=np.shape(AdjacencyMatrix))
         else :
             self.CapacityMatrix = capacityMatrix
@@ -62,7 +62,4 @@ class Network:
         if saturated[0].size > 0:
             return list(zip(saturated[0],saturated[1]))
         return -1
-
-
-
 
